@@ -20,7 +20,8 @@ import {
   Brain,
   Zap,
   Eye,
-  BookOpen
+  BookOpen,
+  RefreshCw
 } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 
@@ -31,6 +32,10 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const { profile, progress } = useUser();
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'achievements'>('overview');
+  const [realTimeData, setRealTimeData] = useState({
+    lastUpdated: new Date(),
+    isUpdating: false
+  });
 
   const menuItems = [
     { icon: Home, label: 'Dashboard', screen: 'dashboard' as const, active: true },
@@ -140,6 +145,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       reward: '+25 coins',
       icon: Users,
       color: 'text-green-400'
+    },
+    { 
+      type: 'lesson', 
+      title: 'Completed Cash Flow Analysis', 
+      time: '4 days ago', 
+      reward: '+75 coins',
+      icon: BookOpen,
+      color: 'text-purple-400'
+    },
+    { 
+      type: 'scam', 
+      title: 'Avoided TikTok Investment Scam', 
+      time: '5 days ago', 
+      reward: '+150 coins',
+      icon: Shield,
+      color: 'text-red-400'
     }
   ];
 
@@ -154,8 +175,38 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     }
   };
 
+  const updateRealTimeData = () => {
+    setRealTimeData(prev => ({ ...prev, isUpdating: true }));
+    
+    // Simulate real-time data update
+    setTimeout(() => {
+      setRealTimeData({
+        lastUpdated: new Date(),
+        isUpdating: false
+      });
+    }, 1000);
+  };
+
   const renderOverview = () => (
     <div className="space-y-6">
+      {/* Real-time Update Header */}
+      <div className="flex items-center justify-between bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/10">
+        <div className="flex items-center space-x-3">
+          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+          <span className="text-white text-sm">
+            Last updated: {realTimeData.lastUpdated.toLocaleTimeString()}
+          </span>
+        </div>
+        <button
+          onClick={updateRealTimeData}
+          disabled={realTimeData.isUpdating}
+          className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`${realTimeData.isUpdating ? 'animate-spin' : ''}`} size={16} />
+          <span>Refresh</span>
+        </button>
+      </div>
+
       {/* Progress Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-lg rounded-xl p-6 border border-blue-500/30">
@@ -221,7 +272,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-white font-semibold text-xl flex items-center">
             <BarChart3 className="mr-2" size={24} />
-            Weekly Progress
+            Weekly Progress (Real-time)
           </h2>
           <div className="flex items-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
@@ -231,6 +282,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-red-400 rounded-full"></div>
               <span className="text-red-200">Security</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+              <span className="text-green-200">Challenges</span>
             </div>
           </div>
         </div>
@@ -247,6 +302,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   className="bg-red-400 rounded-t"
                   style={{ height: `${(day.security / 100) * 100}%`, minHeight: '4px' }}
                 />
+                <div 
+                  className="bg-green-400 rounded-t"
+                  style={{ height: `${(day.challenges / 5) * 100}%`, minHeight: '4px' }}
+                />
               </div>
               <span className="text-purple-300 text-xs mt-2">{day.day}</span>
             </div>
@@ -258,7 +317,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
         <h2 className="text-white font-semibold text-xl mb-4 flex items-center">
           <Activity className="mr-2" size={24} />
-          Recent Activities
+          Recent Activities (Live Feed)
         </h2>
         <div className="space-y-4">
           {recentActivities.map((activity, index) => (
@@ -275,6 +334,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-4 text-center">
+          <button className="text-purple-300 hover:text-white text-sm transition-colors">
+            View All Activities →
+          </button>
         </div>
       </div>
     </div>
