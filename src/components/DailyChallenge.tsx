@@ -38,166 +38,232 @@ export const DailyChallenge: React.FC<DailyChallengeProps> = ({ onNavigate }) =>
     {
       id: '1',
       type: 'sms',
-      title: 'Ngân hàng khóa tài khoản',
-      scenario: 'Bạn nhận được tin nhắn SMS',
-      context: 'CẢNH BÁO: Tài khoản VCB của bạn đã bị khóa do hoạt động bất thường. Nhấn vào link để xác minh ngay: vcb-verify.com/unlock',
+      title: 'Bank Account Locked SMS',
+      scenario: 'You receive an SMS message',
+      context: 'WARNING: Your VCB account has been locked due to unusual activity. Click link to verify immediately: vcb-verify.com/unlock',
       options: [
         {
           id: 'a',
-          text: 'Nhấn vào link ngay để xác minh',
+          text: 'Click the link immediately to verify',
           correct: false,
-          consequence: 'Bạn có thể bị lừa đảo và mất thông tin cá nhân',
-          explanation: 'Đây là tin nhắn lừa đảo. Ngân hàng không bao giờ yêu cầu xác minh qua SMS.'
+          consequence: 'You could be scammed and lose personal information',
+          explanation: 'This is a scam message. Banks never ask for verification via SMS.'
         },
         {
           id: 'b',
-          text: 'Gọi trực tiếp đến số hotline chính thức của ngân hàng',
+          text: 'Call the bank directly using their official hotline',
           correct: true,
-          consequence: 'Bạn xác minh an toàn và tránh được lừa đảo',
-          explanation: 'Đúng! Luôn liên hệ trực tiếp với ngân hàng qua số điện thoại chính thức.'
+          consequence: 'You verify safely and avoid being scammed',
+          explanation: 'Correct! Always contact the bank directly through official phone numbers.'
         },
         {
           id: 'c',
-          text: 'Bỏ qua tin nhắn hoàn toàn',
+          text: 'Ignore the message completely',
           correct: false,
-          consequence: 'Có thể bỏ lỡ thông tin quan trọng nếu đó là tin nhắn thật',
-          explanation: 'Tốt hơn nên xác minh với ngân hàng để chắc chắn.'
+          consequence: 'Might miss important information if it was a real message',
+          explanation: 'Better to verify with the bank to be sure.'
         }
       ],
       reward: 100,
-      aiMentorTip: 'Ngân hàng không bao giờ yêu cầu xác minh thông tin qua SMS hoặc email. Luôn liên hệ trực tiếp!',
+      aiMentorTip: 'Banks never ask for information verification via SMS or email. Always contact directly!',
       difficulty: 'easy'
     },
     {
       id: '2',
-      type: 'social',
-      title: 'Bạn bè mời góp vốn',
-      scenario: 'Bạn thân nhất mời bạn tham gia',
-      context: 'Bạn thân: "Mình vừa tham gia một nhóm đầu tư crypto siêu lợi nhuận! Chỉ cần 5 triệu, sau 1 tháng nhận lại 10 triệu. Bạn có muốn tham gia không?"',
+      type: 'investment',
+      title: 'FOMO TikTok Investment Ad',
+      scenario: 'You see a TikTok ad',
+      context: 'TikTok Ad: "🚀 LAST CHANCE! Invest in MegaCoin now and get 10% MONTHLY returns with ZERO risk! My students made $50,000 in 30 days! Link in bio - only 24 hours left!"',
       options: [
         {
           id: 'a',
-          text: 'Đầu tư ngay vì tin tưởng bạn thân',
+          text: 'Invest immediately - don\'t want to miss out!',
           correct: false,
-          consequence: 'Có thể mất tiền và ảnh hưởng đến tình bạn',
-          explanation: 'Dù là bạn thân, vẫn cần thận trọng với các khoản đầu tư "lợi nhuận cao".'
+          consequence: 'You likely lose money to a FOMO scam',
+          explanation: 'FOMO tactics and unrealistic returns are classic scam signs.'
         },
         {
           id: 'b',
-          text: 'Yêu cầu thông tin chi tiết và nghiên cứu kỹ trước khi quyết định',
+          text: 'Research the company and check for licenses before deciding',
           correct: true,
-          consequence: 'Bạn đưa ra quyết định sáng suốt dựa trên thông tin',
-          explanation: 'Đúng! Luôn nghiên cứu kỹ mọi khoản đầu tư, kể cả khi được giới thiệu bởi người thân.'
+          consequence: 'You make an informed decision and avoid scams',
+          explanation: 'Correct! Always research investments thoroughly, especially those with unrealistic promises.'
         },
         {
           id: 'c',
-          text: 'Từ chối ngay và cắt đứt liên lạc',
+          text: 'Ask friends to join together for better returns',
           correct: false,
-          consequence: 'Có thể làm tổn thương tình bạn không cần thiết',
-          explanation: 'Không cần cắt đứt, nhưng nên giải thích lý do từ chối một cách tử tế.'
+          consequence: 'You spread the scam to others and lose money together',
+          explanation: 'Never involve others in unverified investment opportunities.'
         }
       ],
       reward: 150,
-      aiMentorTip: 'Lợi nhuận 100% trong 1 tháng là dấu hiệu của lừa đảo. Đầu tư thông minh cần thời gian và nghiên cứu!',
+      aiMentorTip: '10% monthly returns with zero risk is impossible. Real investments carry risk and require research!',
       difficulty: 'medium'
     },
     {
       id: '3',
-      type: 'email',
-      title: 'Email khuyến mãi đặc biệt',
-      scenario: 'Bạn nhận được email từ một trang thương mại điện tử',
-      context: 'CHÚC MỪNG! Bạn đã trúng thưởng 50 triệu VND từ Shopee. Để nhận thưởng, vui lòng chuyển phí xử lý 500,000 VND vào tài khoản: 1234567890 - Nguyễn Văn A',
+      type: 'social',
+      title: 'Ransomware Email Attack',
+      scenario: 'You receive an urgent email',
+      context: 'Subject: URGENT - Your files have been encrypted! We have locked all your important documents. Pay 0.5 Bitcoin to wallet: 1A2B3C4D5E to get the decryption key within 48 hours or lose everything forever!',
       options: [
         {
           id: 'a',
-          text: 'Chuyển tiền ngay để nhận thưởng',
+          text: 'Pay the Bitcoin ransom immediately',
           correct: false,
-          consequence: 'Bạn sẽ mất 500,000 VND và không nhận được gì',
-          explanation: 'Đây là lừa đảo. Không có giải thưởng nào yêu cầu trả phí trước.'
+          consequence: 'You lose money and may not get files back anyway',
+          explanation: 'Paying ransomware encourages more attacks and doesn\'t guarantee file recovery.'
         },
         {
           id: 'b',
-          text: 'Kiểm tra email gửi và liên hệ Shopee chính thức',
+          text: 'Disconnect from internet and contact IT security experts',
           correct: true,
-          consequence: 'Bạn xác minh được đây là email lừa đảo',
-          explanation: 'Đúng! Luôn xác minh qua kênh chính thức trước khi hành động.'
+          consequence: 'You contain the attack and get professional help',
+          explanation: 'Correct! Isolate the system and get expert help rather than paying criminals.'
         },
         {
           id: 'c',
-          text: 'Chia sẻ thông tin với bạn bè để họ cũng tham gia',
+          text: 'Click links in the email to learn more',
           correct: false,
-          consequence: 'Bạn có thể làm bạn bè cũng bị lừa đảo',
-          explanation: 'Không nên chia sẻ thông tin chưa được xác minh.'
+          consequence: 'You might download more malware or give attackers more access',
+          explanation: 'Never click links in suspicious emails, especially ransomware threats.'
         }
       ],
       reward: 120,
-      aiMentorTip: 'Không có giải thưởng nào yêu cầu bạn trả tiền trước. Đây là dấu hiệu rõ ràng của lừa đảo!',
-      difficulty: 'easy'
-    },
-    {
-      id: '4',
-      type: 'investment',
-      title: 'Cơ hội đầu tư "độc quyền"',
-      scenario: 'Một người lạ liên hệ qua mạng xã hội',
-      context: 'Chuyên gia tài chính: "Tôi có thông tin nội bộ về một cổ phiếu sắp tăng 500%. Chỉ cần đầu tư 10 triệu, sau 1 tuần sẽ có 50 triệu. Cơ hội có hạn!"',
-      options: [
-        {
-          id: 'a',
-          text: 'Đầu tư ngay vì không muốn bỏ lỡ cơ hội',
-          correct: false,
-          consequence: 'Rất có thể bạn sẽ mất toàn bộ số tiền đầu tư',
-          explanation: 'Thông tin nội bộ và lợi nhuận không thực tế là dấu hiệu của lừa đảo.'
-        },
-        {
-          id: 'b',
-          text: 'Yêu cầu giấy phép hoạt động và nghiên cứu kỹ',
-          correct: true,
-          consequence: 'Bạn phát hiện đây là lừa đảo và tránh được rủi ro',
-          explanation: 'Đúng! Luôn yêu cầu giấy tờ chứng minh và nghiên cứu kỹ trước khi đầu tư.'
-        },
-        {
-          id: 'c',
-          text: 'Đầu tư một phần nhỏ để thử nghiệm',
-          correct: false,
-          consequence: 'Vẫn có thể mất tiền và tạo niềm tin sai lầm',
-          explanation: 'Không nên đầu tư vào các cơ hội không rõ ràng, dù là số tiền nhỏ.'
-        }
-      ],
-      reward: 200,
-      aiMentorTip: 'Lợi nhuận 500% trong 1 tuần là không thể. Đầu tư thông minh cần thời gian và kiến thức!',
+      aiMentorTip: 'Ransomware attacks are serious. Never pay ransoms - backup data regularly and use security software!',
       difficulty: 'hard'
     },
     {
-      id: '5',
-      type: 'call',
-      title: 'Cuộc gọi hỗ trợ kỹ thuật',
-      scenario: 'Bạn nhận được cuộc gọi',
-      context: 'Người gọi: "Xin chào, tôi là nhân viên Microsoft. Máy tính của bạn đã bị nhiễm virus nghiêm trọng. Chúng tôi cần truy cập từ xa để sửa chữa ngay."',
+      id: '4',
+      type: 'social',
+      title: 'Online Purchase Scam',
+      scenario: 'You find a great deal online',
+      context: 'Facebook Marketplace: "iPhone 15 Pro Max - Brand New, Original Box - Only $200! Must sell today due to emergency. Payment via bank transfer only. No meetups, will ship immediately!"',
       options: [
         {
           id: 'a',
-          text: 'Cho phép truy cập từ xa ngay lập tức',
+          text: 'Transfer money immediately - great deal!',
           correct: false,
-          consequence: 'Máy tính có thể bị cài phần mềm độc hại hoặc đánh cắp dữ liệu',
-          explanation: 'Microsoft không bao giờ gọi điện chủ động để hỗ trợ kỹ thuật.'
+          consequence: 'You lose money and receive nothing',
+          explanation: 'Too-good-to-be-true prices and bank transfer only are scam red flags.'
         },
         {
           id: 'b',
-          text: 'Cúp máy và liên hệ Microsoft qua kênh chính thức',
+          text: 'Ask to meet in person and inspect the item first',
           correct: true,
-          consequence: 'Bạn tránh được lừa đảo và bảo vệ máy tính',
-          explanation: 'Đúng! Các công ty công nghệ lớn không gọi điện chủ động như vậy.'
+          consequence: 'You avoid the scam by insisting on safe transaction methods',
+          explanation: 'Correct! Always inspect items in person and use secure payment methods.'
         },
         {
           id: 'c',
-          text: 'Hỏi thông tin cá nhân để xác minh',
+          text: 'Ask for more photos and seller verification',
           correct: false,
-          consequence: 'Kẻ lừa đảo có thể sử dụng thông tin này để thuyết phục bạn',
-          explanation: 'Không nên cung cấp thông tin cá nhân cho người lạ qua điện thoại.'
+          consequence: 'Scammer can easily fake photos and documents',
+          explanation: 'Photos can be stolen from legitimate listings. Physical inspection is key.'
+        }
+      ],
+      reward: 200,
+      aiMentorTip: 'If the price seems too good to be true, it probably is. Always meet sellers in safe public places!',
+      difficulty: 'medium'
+    },
+    {
+      id: '5',
+      type: 'social',
+      title: 'Job Scam - Fake Remote Work',
+      scenario: 'You receive a job offer email',
+      context: 'Email: "Congratulations! You\'ve been selected for a $5000/month remote data entry position. No experience needed! Just pay $299 for training materials and equipment. Start earning immediately after payment!"',
+      options: [
+        {
+          id: 'a',
+          text: 'Pay the fee - $5000/month sounds amazing!',
+          correct: false,
+          consequence: 'You lose $299 and the job doesn\'t exist',
+          explanation: 'Legitimate employers never ask for upfront payments from employees.'
+        },
+        {
+          id: 'b',
+          text: 'Research the company and ask for official documentation',
+          correct: true,
+          consequence: 'You discover it\'s a scam and avoid losing money',
+          explanation: 'Correct! Always verify job offers through official company channels.'
+        },
+        {
+          id: 'c',
+          text: 'Ask friends if they know about this opportunity',
+          correct: false,
+          consequence: 'Friends might not recognize the scam either',
+          explanation: 'Better to research the company directly rather than rely on word-of-mouth.'
         }
       ],
       reward: 130,
-      aiMentorTip: 'Các công ty công nghệ lớn không bao giờ gọi điện chủ động để hỗ trợ. Luôn cúp máy và liên hệ qua kênh chính thức!',
+      aiMentorTip: 'Real jobs pay you, not the other way around. Never pay upfront fees for employment!',
+      difficulty: 'medium'
+    },
+    {
+      id: '6',
+      type: 'email',
+      title: 'Phishing Email - Fake Bank Alert',
+      scenario: 'You receive an urgent email',
+      context: 'From: security@vietcombank-official.com - "URGENT: Suspicious login detected from China. Your account will be suspended in 2 hours. Click here to verify your identity and secure your account: http://vcb-security-check.net"',
+      options: [
+        {
+          id: 'a',
+          text: 'Click the link and enter my banking details',
+          correct: false,
+          consequence: 'Hackers steal your banking credentials and money',
+          explanation: 'The domain is fake - real VCB emails come from vietcombank.com.vn'
+        },
+        {
+          id: 'b',
+          text: 'Check the sender domain and call the bank directly',
+          correct: true,
+          consequence: 'You identify the phishing attempt and protect your account',
+          explanation: 'Correct! Always verify suspicious emails by contacting the institution directly.'
+        },
+        {
+          id: 'c',
+          text: 'Forward the email to friends to warn them',
+          correct: false,
+          consequence: 'You might accidentally spread the phishing link',
+          explanation: 'Better to report to the bank\'s security team instead of forwarding.'
+        }
+      ],
+      reward: 180,
+      aiMentorTip: 'Check email domains carefully! Scammers use similar-looking domains to trick victims.',
+      difficulty: 'easy'
+    },
+    {
+      id: '7',
+      type: 'social',
+      title: 'Social Engineering - Fake Tech Support',
+      scenario: 'You receive a phone call',
+      context: 'Caller: "Hello, this is John from Apple Support. We detected unusual activity on your iPhone. Someone in Russia is trying to access your photos. We need to install our security software remotely to protect you."',
+      options: [
+        {
+          id: 'a',
+          text: 'Allow remote access to fix the security issue',
+          correct: false,
+          consequence: 'Scammers install malware and steal your personal data',
+          explanation: 'Apple never calls customers proactively about security issues.'
+        },
+        {
+          id: 'b',
+          text: 'Hang up and contact Apple through official channels',
+          correct: true,
+          consequence: 'You avoid the scam and protect your device',
+          explanation: 'Correct! Tech companies don\'t make unsolicited support calls.'
+        },
+        {
+          id: 'c',
+          text: 'Ask for their employee ID and callback number',
+          correct: false,
+          consequence: 'Scammers can provide fake credentials to seem legitimate',
+          explanation: 'Even with fake IDs, it\'s better to hang up and call official support.'
+        }
+      ],
+      reward: 160,
+      aiMentorTip: 'Major tech companies never call you first. They communicate through official apps and emails!',
       difficulty: 'medium'
     }
   ];
@@ -387,7 +453,7 @@ export const DailyChallenge: React.FC<DailyChallengeProps> = ({ onNavigate }) =>
             </div>
 
             <div className="space-y-4">
-              <h4 className="text-white font-semibold text-lg">Bạn sẽ xử lý tình huống này như thế nào?</h4>
+              <h4 className="text-white font-semibold text-lg">How would you handle this situation?</h4>
               {currentRealityChallenge.options.map(option => {
                 const isSelected = selectedAnswer === option.id;
                 const isCorrect = option.correct;
@@ -422,7 +488,7 @@ export const DailyChallenge: React.FC<DailyChallengeProps> = ({ onNavigate }) =>
                     {showFeedback && isSelected && (
                       <div className="mt-3 pt-3 border-t border-white/20">
                         <p className="text-sm font-medium mb-1">
-                          {isCorrect ? '✅ Kết quả:' : '❌ Kết quả:'} {option.consequence}
+                          {isCorrect ? '✅ Result:' : '❌ Result:'} {option.consequence}
                         </p>
                         <p className="text-sm opacity-90">{option.explanation}</p>
                       </div>

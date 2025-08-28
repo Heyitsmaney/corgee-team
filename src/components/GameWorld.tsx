@@ -70,6 +70,12 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
     savingsAccounts: [],
     creditCards: []
   });
+  const [selectedStock, setSelectedStock] = useState<string | null>(null);
+  const [portfolio, setPortfolio] = useState({
+    cash: 5000,
+    holdings: [] as any[],
+    totalValue: 5000
+  });
   const [monthlyBudget, setMonthlyBudget] = useState({
     income: 3000,
     spent: 0,
@@ -131,6 +137,87 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       icon: ShoppingCart,
       color: 'from-purple-500 to-indigo-500',
       activities: ['price-comparison', 'bargain-hunting', 'scam-detection', 'quality-assessment']
+    }
+  ];
+
+  // Stock market data with candlestick charts
+  const stockData = [
+    {
+      symbol: 'VCB',
+      name: 'Vietcombank',
+      price: 85.5,
+      change: +2.3,
+      changePercent: +2.76,
+      volume: 1250000,
+      marketCap: '425B VND',
+      pe: 12.5,
+      dividend: 3.2,
+      candlestick: [
+        { time: '09:00', open: 83.2, high: 86.1, low: 82.8, close: 85.5 },
+        { time: '10:00', open: 85.5, high: 87.2, low: 84.9, close: 86.8 },
+        { time: '11:00', open: 86.8, high: 88.5, low: 85.2, close: 87.1 }
+      ],
+      scamRisk: 'low',
+      analysis: 'Strong fundamentals, established bank with good dividend yield'
+    },
+    {
+      symbol: 'FAKE-CRYPTO',
+      name: 'MoonCoin Pro',
+      price: 0.0045,
+      change: +156.7,
+      changePercent: +3482.22,
+      volume: 999999999,
+      marketCap: '???',
+      pe: 'N/A',
+      dividend: 0,
+      candlestick: [
+        { time: '09:00', open: 0.0001, high: 0.0050, low: 0.0001, close: 0.0045 }
+      ],
+      scamRisk: 'extreme',
+      analysis: '🚨 SCAM ALERT: Unrealistic gains, unknown team, pump & dump scheme'
+    },
+    {
+      symbol: 'VNM',
+      name: 'Vinamilk',
+      price: 72.8,
+      change: -1.2,
+      changePercent: -1.62,
+      volume: 890000,
+      marketCap: '156B VND',
+      pe: 15.8,
+      dividend: 4.1,
+      candlestick: [
+        { time: '09:00', open: 74.0, high: 74.5, low: 72.5, close: 72.8 }
+      ],
+      scamRisk: 'low',
+      analysis: 'Stable consumer goods company with consistent dividend payments'
+    }
+  ];
+
+  const investmentScamCases = [
+    {
+      id: 'bond-scam-1',
+      title: 'Fake Government Bond Scam',
+      description: 'Someone offers you "government bonds" with 15% annual return, claiming they have inside connections.',
+      redFlags: ['Unrealistic returns for government bonds', 'Unofficial channels', 'Pressure to invest quickly'],
+      correctAction: 'Only buy government bonds through official channels like banks or licensed brokers',
+      reward: 200
+    },
+    {
+      id: 'stock-pump-dump',
+      title: 'Pump and Dump Scheme',
+      description: 'A Telegram group claims a penny stock will "moon" tomorrow and urges immediate buying.',
+      redFlags: ['Coordinated buying pressure', 'Unrealistic price targets', 'Anonymous sources'],
+      correctAction: 'Research companies independently, avoid following crowd mentality',
+      reward: 250
+    },
+    {
+      id: 'fake-ipo',
+      title: 'Fake IPO Investment',
+      description: 'Email claims you can invest in "pre-IPO shares" of a famous company at discount prices.',
+      redFlags: ['Unofficial IPO access', 'Too-good-to-be-true pricing', 'Urgent deadlines'],
+      correctAction: 'IPOs are only available through licensed brokers and official channels',
+      reward: 180
     }
   ];
 
@@ -400,6 +487,52 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       addCoins(-10);
       showAiMentorFeedback(`💸 You overpaid for "${item.name}". ${item.bargainTip} Research market prices before buying.`);
     }
+  };
+
+  const renderCandlestickChart = (data: any[]) => {
+    return (
+      <div className="bg-gray-900 p-4 rounded-lg">
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-white font-semibold">Price Chart</h4>
+          <div className="flex space-x-2 text-xs">
+            <button className="bg-green-600 text-white px-2 py-1 rounded">1D</button>
+            <button className="bg-gray-600 text-gray-300 px-2 py-1 rounded">1W</button>
+            <button className="bg-gray-600 text-gray-300 px-2 py-1 rounded">1M</button>
+          </div>
+        </div>
+        <div className="h-32 flex items-end space-x-2">
+          {data.map((candle, index) => {
+            const isGreen = candle.close > candle.open;
+            const bodyHeight = Math.abs(candle.close - candle.open) * 100;
+            const wickTop = (candle.high - Math.max(candle.open, candle.close)) * 100;
+            const wickBottom = (Math.min(candle.open, candle.close) - candle.low) * 100;
+            
+            return (
+              <div key={index} className="flex flex-col items-center">
+                <div className="text-xs text-gray-400 mb-1">{candle.time}</div>
+                <div className="relative">
+                  {/* Upper wick */}
+                  <div 
+                    className="w-0.5 bg-gray-400 mx-auto"
+                    style={{ height: `${wickTop}px` }}
+                  />
+                  {/* Body */}
+                  <div 
+                    className={`w-4 ${isGreen ? 'bg-green-500' : 'bg-red-500'}`}
+                    style={{ height: `${Math.max(bodyHeight, 2)}px` }}
+                  />
+                  {/* Lower wick */}
+                  <div 
+                    className="w-0.5 bg-gray-400 mx-auto"
+                    style={{ height: `${wickBottom}px` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   const renderSettings = () => (
@@ -757,6 +890,193 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
           </div>
         </div>
       )}
+    </div>
+  );
+
+  const renderInvestmentPark = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <TrendingUp className="mx-auto mb-4 text-green-400" size={64} />
+        <h2 className="text-2xl font-bold text-white mb-2">Investment Park</h2>
+        <p className="text-purple-200">Learn to invest wisely and avoid investment scams</p>
+      </div>
+
+      {/* Portfolio Overview */}
+      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+        <h3 className="text-xl font-bold text-white mb-4">Your Portfolio</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-blue-500/20 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-white">{portfolio.cash.toLocaleString()} VND</div>
+            <div className="text-blue-200 text-sm">Available Cash</div>
+          </div>
+          <div className="bg-green-500/20 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-white">{portfolio.totalValue.toLocaleString()} VND</div>
+            <div className="text-green-200 text-sm">Total Portfolio Value</div>
+          </div>
+          <div className="bg-purple-500/20 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-white">{portfolio.holdings.length}</div>
+            <div className="text-purple-200 text-sm">Holdings</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stock Market */}
+      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+        <h3 className="text-xl font-bold text-white mb-4">Stock Market</h3>
+        <div className="space-y-4">
+          {stockData.map((stock, index) => (
+            <div key={index} className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+              selectedStock === stock.symbol 
+                ? 'border-purple-500 bg-purple-500/10' 
+                : stock.scamRisk === 'extreme'
+                  ? 'border-red-500/50 bg-red-500/10'
+                  : 'border-white/20 bg-white/5 hover:bg-white/10'
+            }`} onClick={() => setSelectedStock(selectedStock === stock.symbol ? null : stock.symbol)}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center space-x-3">
+                    <h4 className="text-white font-semibold">{stock.symbol}</h4>
+                    <span className="text-gray-300">{stock.name}</span>
+                    {stock.scamRisk === 'extreme' && (
+                      <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">SCAM ALERT</span>
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-400 mt-1">
+                    Volume: {stock.volume.toLocaleString()} | P/E: {stock.pe} | Dividend: {stock.dividend}%
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xl font-bold text-white">{stock.price.toLocaleString()} VND</div>
+                  <div className={`text-sm font-semibold ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {stock.change >= 0 ? '+' : ''}{stock.change} ({stock.changePercent >= 0 ? '+' : ''}{stock.changePercent}%)
+                  </div>
+                </div>
+              </div>
+              
+              {selectedStock === stock.symbol && (
+                <div className="mt-4 pt-4 border-t border-white/20">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      {renderCandlestickChart(stock.candlestick)}
+                    </div>
+                    <div className="space-y-4">
+                      <div className="bg-white/10 p-4 rounded-lg">
+                        <h5 className="text-white font-semibold mb-2">Analysis</h5>
+                        <p className={`text-sm ${stock.scamRisk === 'extreme' ? 'text-red-200' : 'text-gray-300'}`}>
+                          {stock.analysis}
+                        </p>
+                      </div>
+                      
+                      {stock.scamRisk === 'low' ? (
+                        <button 
+                          onClick={() => {
+                            addCoins(-stock.price * 10);
+                            setPortfolio(prev => ({
+                              ...prev,
+                              cash: prev.cash - (stock.price * 10),
+                              holdings: [...prev.holdings, { symbol: stock.symbol, shares: 10, price: stock.price }]
+                            }));
+                            alert(`Bought 10 shares of ${stock.symbol} for ${(stock.price * 10).toLocaleString()} VND`);
+                          }}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition-colors"
+                        >
+                          Buy 10 Shares ({(stock.price * 10).toLocaleString()} VND)
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => {
+                            updateProgress({ milSkillScore: progress.milSkillScore + 50 });
+                            addCoins(300);
+                            alert('Good job! You avoided a scam and earned 300 coins + 50 security points!');
+                          }}
+                          className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition-colors"
+                        >
+                          🚨 Report as Scam (Earn Rewards)
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Investment Scam Education */}
+      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+        <h3 className="text-xl font-bold text-white mb-4">Investment Scam Cases</h3>
+        <div className="space-y-4">
+          {investmentScamCases.map((scamCase, index) => (
+            <div key={index} className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+              <h4 className="text-red-200 font-semibold mb-2">{scamCase.title}</h4>
+              <p className="text-gray-300 mb-3">{scamCase.description}</p>
+              
+              <div className="mb-3">
+                <h5 className="text-yellow-200 font-medium mb-1">🚩 Red Flags:</h5>
+                <ul className="text-sm text-gray-300 list-disc list-inside">
+                  {scamCase.redFlags.map((flag, i) => (
+                    <li key={i}>{flag}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="mb-3">
+                <h5 className="text-green-200 font-medium mb-1">✅ Correct Action:</h5>
+                <p className="text-sm text-gray-300">{scamCase.correctAction}</p>
+              </div>
+              
+              <button
+                onClick={() => {
+                  addCoins(scamCase.reward);
+                  updateProgress({ milSkillScore: progress.milSkillScore + 30 });
+                  alert(`Great! You learned about ${scamCase.title}. +${scamCase.reward} coins, +30 security points!`);
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+              >
+                Learn & Earn {scamCase.reward} Coins
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Investment Tips */}
+      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+        <h3 className="text-xl font-bold text-white mb-4">Smart Investment Tips</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            {
+              title: 'Research Before Investing',
+              tip: 'Always check company financials, read annual reports, and understand the business model',
+              icon: '📊'
+            },
+            {
+              title: 'Diversify Your Portfolio',
+              tip: 'Don\'t put all eggs in one basket. Spread investments across different sectors and asset classes',
+              icon: '🎯'
+            },
+            {
+              title: 'Beware of Get-Rich-Quick Schemes',
+              tip: 'If it promises unrealistic returns with no risk, it\'s likely a scam',
+              icon: '⚠️'
+            },
+            {
+              title: 'Use Licensed Brokers Only',
+              tip: 'Only invest through regulated, licensed financial institutions',
+              icon: '🏛️'
+            }
+          ].map((tip, index) => (
+            <div key={index} className="bg-white/5 p-4 rounded-lg">
+              <div className="flex items-center space-x-3 mb-2">
+                <span className="text-2xl">{tip.icon}</span>
+                <h4 className="text-white font-semibold">{tip.title}</h4>
+              </div>
+              <p className="text-gray-300 text-sm">{tip.tip}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 
@@ -1169,111 +1489,6 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
         return renderOverview();
     }
   };
-
-  const renderInvestmentPark = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={() => setCurrentDistrict('overview')}
-          className="flex items-center space-x-2 text-purple-200 hover:text-white transition-colors"
-        >
-          <ArrowLeft size={20} />
-          <span>Back to City</span>
-        </button>
-      </div>
-
-      <div className="text-center mb-8">
-        <TrendingUp className="mx-auto mb-4 text-green-400" size={64} />
-        <h1 className="text-3xl font-bold text-white mb-2">Investment Park</h1>
-        <p className="text-green-200">Build your investment portfolio and learn about markets</p>
-      </div>
-
-      {/* Investment Options */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {investments.map(investment => (
-          <div key={investment.id} className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-white font-bold text-lg">{investment.name}</h3>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  investment.type === 'stock' ? 'bg-blue-500/30 text-blue-200' :
-                  investment.type === 'crypto' ? 'bg-orange-500/30 text-orange-200' :
-                  'bg-green-500/30 text-green-200'
-                }`}>
-                  {investment.type.toUpperCase()}
-                </span>
-              </div>
-              <div className="text-right">
-                <div className="text-white font-bold">{investment.price.toLocaleString()}</div>
-                <div className={`text-sm ${investment.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {investment.change >= 0 ? '+' : ''}{investment.change}%
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-purple-200">You own</span>
-                <span className="text-white">{investment.owned} shares</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-purple-200">Risk Level</span>
-                <span className={`${
-                  investment.risk === 'low' ? 'text-green-400' :
-                  investment.risk === 'medium' ? 'text-yellow-400' :
-                  'text-red-400'
-                }`}>
-                  {investment.risk.toUpperCase()}
-                </span>
-              </div>
-              
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handleInvestment(investment.id, 'buy', 1)}
-                  disabled={bankAccount.balance < investment.price}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Buy 1 Share
-                </button>
-                <button
-                  onClick={() => handleInvestment(investment.id, 'sell', 1)}
-                  disabled={investment.owned < 1}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Sell 1 Share
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Portfolio Summary */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-        <h2 className="text-white font-semibold text-xl mb-4">Portfolio Summary</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">
-              {investments.reduce((sum, inv) => sum + (inv.owned * inv.price), 0).toLocaleString()}
-            </div>
-            <div className="text-purple-300 text-sm">Total Value</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">
-              {investments.reduce((sum, inv) => sum + inv.owned, 0)}
-            </div>
-            <div className="text-purple-300 text-sm">Total Shares</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-400">
-              +{investments.reduce((sum, inv) => sum + (inv.owned * inv.price * inv.change / 100), 0).toFixed(0)}
-            </div>
-            <div className="text-purple-300 text-sm">Today's P&L</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   const handleInvestment = (investmentId: string, action: 'buy' | 'sell', amount: number) => {
     const investment = investments.find(inv => inv.id === investmentId);

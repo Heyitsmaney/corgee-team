@@ -4,6 +4,7 @@ import {
   Gamepad2, 
   Calendar, 
   Users, 
+  Settings as SettingsIcon,
   Trophy, 
   Coins, 
   Target,

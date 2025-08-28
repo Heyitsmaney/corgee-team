@@ -4,6 +4,7 @@ import { Dashboard } from './components/Dashboard';
 import { GameWorld } from './components/GameWorld';
 import { DailyChallenge } from './components/DailyChallenge';
 import { Community } from './components/Community';
+import { Settings } from './components/Settings';
 import { UserProvider } from './contexts/UserContext';
 import { GameProvider } from './contexts/GameContext';
 
