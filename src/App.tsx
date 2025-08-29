@@ -9,7 +9,7 @@ import { UserProvider } from './contexts/UserContext';
 import { GameProvider } from './contexts/GameContext';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<'onboarding' | 'dashboard' | 'game' | 'challenge' | 'community'>('onboarding');
+  const [currentScreen, setCurrentScreen] = useState<'onboarding' | 'dashboard' | 'game' | 'challenge' | 'community' | 'settings'>('onboarding');
   const [isOnboarded, setIsOnboarded] = useState(false);
 
   useEffect(() => {
@@ -39,6 +39,8 @@ function App() {
         return <DailyChallenge onNavigate={setCurrentScreen} />;
       case 'community':
         return <Community onNavigate={setCurrentScreen} />;
+      case 'settings':
+        return <Settings onNavigate={setCurrentScreen} />;
       default:
         return <Dashboard onNavigate={setCurrentScreen} />;
     }

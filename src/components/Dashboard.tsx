@@ -27,7 +27,7 @@ import {
 import { useUser } from '../contexts/UserContext';
 
 interface DashboardProps {
-  onNavigate: (screen: 'dashboard' | 'game' | 'challenge' | 'community') => void;
+  onNavigate: (screen: 'dashboard' | 'game' | 'challenge' | 'community' | 'settings') => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
@@ -43,6 +43,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     { icon: Gamepad2, label: 'Game World', screen: 'game' as const },
     { icon: Calendar, label: 'Daily Challenges', screen: 'challenge' as const },
     { icon: Users, label: 'Community', screen: 'community' as const },
+    { icon: SettingsIcon, label: 'Settings', screen: 'settings' as const },
   ];
 
   const achievements = [

@@ -3,7 +3,7 @@ import { ArrowLeft, Users, Upload, Flag, MessageCircle, ThumbsUp, Camera, AlertT
 import { useUser } from '../contexts/UserContext';
 
 interface CommunityProps {
-  onNavigate: (screen: 'dashboard' | 'game' | 'challenge' | 'community') => void;
+  onNavigate: (screen: 'dashboard' | 'game' | 'challenge' | 'community' | 'settings') => void;
 }
 
 interface ScamReport {
