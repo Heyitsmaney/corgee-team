@@ -40,7 +40,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       icon: Shield,
       color: 'from-red-500 to-orange-500',
       description: 'Learn cybersecurity and scam detection skills',
-      unlocked: progress.level >= 2,
+      unlocked: true,
       level: 2,
       position: { x: 70, y: 20 },
       activities: ['Phishing Detector', 'Ransomware Defense', 'Social Engineering Quiz', 'FOMO Resistance']
@@ -51,7 +51,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       icon: ShoppingCart,
       color: 'from-green-500 to-emerald-500',
       description: 'Smart shopping and budget management',
-      unlocked: progress.level >= 1,
+      unlocked: true,
       level: 4,
       position: { x: 20, y: 70 },
       activities: ['Bargain Hunter', 'Price Comparison', 'Scam Detector', 'Budget Challenge']
@@ -62,7 +62,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       icon: TrendingUp,
       color: 'from-purple-500 to-pink-500',
       description: 'Trading, investing, and portfolio management',
-      unlocked: progress.level >= 3,
+      unlocked: true,
       level: 1,
       position: { x: 70, y: 70 },
       activities: ['Stock Simulator', 'Portfolio Builder', 'Risk Assessment', 'Market Analysis']
