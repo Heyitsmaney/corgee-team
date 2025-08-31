@@ -1,36 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Building2, Calculator, PiggyBank, CreditCard, TrendingUp, DollarSign, Target, BookOpen, Award, Coins, Brain, AlertTriangle, CheckCircle, BarChart3, Activity, Percent, Clock, Shield, Star, Zap, Gift } from 'lucide-react';
+import { ArrowLeft, Building2, Calculator, PiggyBank, CreditCard, TrendingUp, DollarSign, Percent, Target, BookOpen, Play, Award, Coins, BarChart3, AlertTriangle, CheckCircle, Brain, Zap, Clock, Shield } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 
 interface BankDistrictProps {
   onBack: () => void;
 }
 
-interface BankProduct {
-  id: string;
-  name: string;
-  type: 'savings' | 'checking' | 'credit' | 'loan' | 'investment';
-  interestRate: number;
-  fees: number;
-  benefits: string[];
-  requirements: string[];
-  riskLevel: 'low' | 'medium' | 'high';
-  recommended: boolean;
-}
-
-interface FinancialLesson {
+interface BankingLesson {
   id: string;
   title: string;
-  category: 'budgeting' | 'saving' | 'borrowing' | 'investing' | 'planning';
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  category: 'basics' | 'advanced' | 'products' | 'planning';
   content: string;
   keyPoints: string[];
-  practicalExercise: string;
-  realWorldExample: string;
+  practicalTips: string[];
+  realExamples: string[];
   commonMistakes: string[];
-  actionSteps: string[];
   reward: number;
   completed: boolean;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedTime: string;
+}
+
+interface LoanProduct {
+  id: string;
+  name: string;
+  type: 'personal' | 'mortgage' | 'auto' | 'business' | 'education';
+  interestRate: number;
+  maxAmount: number;
+  term: string;
+  requirements: string[];
+  pros: string[];
+  cons: string[];
+  bestFor: string;
+  realExample: string;
+}
+
+interface CreditCard {
+  id: string;
+  name: string;
+  type: 'basic' | 'rewards' | 'premium' | 'business';
+  apr: number;
+  annualFee: number;
+  rewards: string;
+  benefits: string[];
+  requirements: string[];
+  pros: string[];
+  cons: string[];
+  bestFor: string;
 }
 
 interface BudgetCategory {
@@ -42,1129 +58,458 @@ interface BudgetCategory {
   tips: string[];
 }
 
-interface LoanScenario {
-  id: string;
-  title: string;
-  amount: number;
-  purpose: string;
-  options: {
-    bank: string;
-    interestRate: number;
-    term: number;
-    monthlyPayment: number;
-    totalCost: number;
-    pros: string[];
-    cons: string[];
-  }[];
-  bestChoice: number;
-  explanation: string;
-  reward: number;
-}
-
 export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
   const { progress, addCoins, updateProgress } = useUser();
-  const [activeGame, setActiveGame] = useState<'overview' | 'budgeting' | 'savings' | 'loans' | 'products' | 'lessons' | 'calculator' | 'cashflow' | 'wheel'>('overview');
-  const [monthlyIncome, setMonthlyIncome] = useState(15000000); // 15M VND
-  const [selectedLesson, setSelectedLesson] = useState<FinancialLesson | null>(null);
-  const [selectedLoanScenario, setSelectedLoanScenario] = useState<LoanScenario | null>(null);
-  const [budgetData, setBudgetData] = useState<BudgetCategory[]>([
-    { name: 'Housing', allocated: 7500000, spent: 7200000, remaining: 300000, color: 'bg-blue-500', tips: ['Consider roommates', 'Negotiate rent', 'Look for utilities included'] },
-    { name: 'Food', allocated: 3000000, spent: 3200000, remaining: -200000, color: 'bg-green-500', tips: ['Cook at home more', 'Buy in bulk', 'Use grocery apps for deals'] },
-    { name: 'Transportation', allocated: 1500000, spent: 1400000, remaining: 100000, color: 'bg-yellow-500', tips: ['Use public transport', 'Carpool with colleagues', 'Walk for short distances'] },
-    { name: 'Entertainment', allocated: 1500000, spent: 2100000, remaining: -600000, color: 'bg-purple-500', tips: ['Find free activities', 'Use student discounts', 'Set entertainment limits'] },
-    { name: 'Savings', allocated: 1500000, spent: 1500000, remaining: 0, color: 'bg-cyan-500', tips: ['Automate savings', 'Start with 10%', 'Use high-yield accounts'] }
-  ]);
-
-  const bankProducts: BankProduct[] = [
-    {
-      id: '1',
-      name: 'Basic Savings Account',
-      type: 'savings',
-      interestRate: 2.5,
-      fees: 0,
-      benefits: ['No minimum balance', 'Free ATM withdrawals', 'Mobile banking'],
-      requirements: ['Valid ID', 'Minimum age 18'],
-      riskLevel: 'low',
-      recommended: true
-    },
-    {
-      id: '2',
-      name: 'High-Yield Savings',
-      type: 'savings',
-      interestRate: 4.2,
-      fees: 50000,
-      benefits: ['Higher interest rate', 'Compound interest', 'Online banking'],
-      requirements: ['Minimum balance 5M VND', 'Monthly deposit 500K VND'],
-      riskLevel: 'low',
-      recommended: true
-    },
-    {
-      id: '3',
-      name: 'Student Credit Card',
-      type: 'credit',
-      interestRate: 18.9,
-      fees: 0,
-      benefits: ['No annual fee', 'Cashback on purchases', 'Build credit history'],
-      requirements: ['Student status', 'Minimum income 3M VND'],
-      riskLevel: 'medium',
-      recommended: true
-    },
-    {
-      id: '4',
-      name: 'Premium Credit Card',
-      type: 'credit',
-      interestRate: 24.9,
-      fees: 2000000,
-      benefits: ['Airport lounge access', '5% cashback', 'Travel insurance'],
-      requirements: ['Minimum income 20M VND', 'Good credit score'],
-      riskLevel: 'high',
-      recommended: false
-    },
-    {
-      id: '5',
-      name: 'Personal Loan',
-      type: 'loan',
-      interestRate: 12.5,
-      fees: 500000,
-      benefits: ['Quick approval', 'Flexible terms', 'No collateral'],
-      requirements: ['Stable income', 'Credit check', 'Employment verification'],
-      riskLevel: 'medium',
-      recommended: false
-    },
-    {
-      id: '6',
-      name: 'Mortgage Loan',
-      type: 'loan',
-      interestRate: 8.5,
-      fees: 10000000,
-      benefits: ['Low interest rate', 'Long repayment term', 'Tax benefits'],
-      requirements: ['20% down payment', 'Stable income 2+ years', 'Property appraisal'],
-      riskLevel: 'high',
-      recommended: true
-    }
-  ];
-
-  const financialLessons: FinancialLesson[] = [
-    {
-      id: '1',
-      title: 'The 50/30/20 Budgeting Rule',
-      category: 'budgeting',
-      difficulty: 'beginner',
-      content: 'The 50/30/20 rule is a simple budgeting framework that allocates your after-tax income into three categories: 50% for needs, 30% for wants, and 20% for savings and debt repayment.',
-      keyPoints: [
-        '50% for essential needs (housing, food, utilities, minimum debt payments)',
-        '30% for wants (entertainment, dining out, hobbies, non-essential shopping)',
-        '20% for savings and extra debt payments (emergency fund, retirement, investments)',
-        'Adjust percentages based on your financial situation and goals',
-        'Track spending regularly to ensure you stay within each category'
-      ],
-      practicalExercise: 'Calculate your monthly after-tax income and allocate it using the 50/30/20 rule. Track your spending for one week to see how well you follow the plan.',
-      realWorldExample: 'Mai earns 15M VND monthly. She allocates 7.5M for rent and food (needs), 4.5M for entertainment and shopping (wants), and 3M for savings and investments (future).',
-      commonMistakes: [
-        'Treating wants as needs (expensive phone plans, premium subscriptions)',
-        'Not tracking spending regularly',
-        'Ignoring the savings category when money is tight',
-        'Being too rigid - adjust percentages based on life changes',
-        'Not accounting for irregular expenses like medical bills'
-      ],
-      actionSteps: [
-        'Calculate your monthly after-tax income',
-        'List all your essential expenses (needs)',
-        'Identify your discretionary spending (wants)',
-        'Set up automatic savings transfers',
-        'Review and adjust monthly'
-      ],
-      reward: 150,
-      completed: false
-    },
-    {
-      id: '2',
-      title: 'Building an Emergency Fund',
-      category: 'saving',
-      difficulty: 'beginner',
-      content: 'An emergency fund is money set aside to cover unexpected expenses like job loss, medical bills, or major repairs. It provides financial security and prevents you from going into debt during emergencies.',
-      keyPoints: [
-        'Start with 1 month of expenses, build to 3-6 months',
-        'Keep emergency funds in easily accessible savings accounts',
-        'Don\'t invest emergency funds in stocks or risky assets',
-        'Only use for true emergencies, not planned expenses',
-        'Replenish immediately after using emergency funds'
-      ],
-      practicalExercise: 'Calculate your monthly essential expenses and set a goal to save 3 months worth. Start by saving 500K VND monthly until you reach your target.',
-      realWorldExample: 'Duc lost his job during COVID-19 but had 6 months of expenses saved (45M VND). This allowed him to pay rent and buy food while searching for new employment without borrowing money.',
-      commonMistakes: [
-        'Using emergency funds for vacations or shopping',
-        'Keeping emergency money in checking accounts with no interest',
-        'Not having any emergency fund at all',
-        'Investing emergency funds in volatile assets',
-        'Setting unrealistic emergency fund goals that discourage saving'
-      ],
-      actionSteps: [
-        'Calculate your monthly essential expenses',
-        'Open a separate high-yield savings account',
-        'Set up automatic transfers of 10-15% of income',
-        'Start with 1 month goal, then build to 3-6 months',
-        'Only use for true emergencies'
-      ],
-      reward: 200,
-      completed: false
-    },
-    {
-      id: '3',
-      title: 'Understanding Interest Rates and Compound Interest',
-      category: 'saving',
-      difficulty: 'intermediate',
-      content: 'Interest is the cost of borrowing money or the reward for saving money. Compound interest is when you earn interest on both your original money and previously earned interest, creating exponential growth over time.',
-      keyPoints: [
-        'Simple interest = Principal × Rate × Time',
-        'Compound interest grows exponentially over time',
-        'The earlier you start saving, the more compound interest works for you',
-        'High-interest debt (credit cards) compounds against you',
-        'Even small amounts saved early can grow significantly'
-      ],
-      practicalExercise: 'Compare saving 1M VND monthly starting at age 25 vs age 35. Calculate the difference after 30 years with 6% annual interest.',
-      realWorldExample: 'Linh saves 2M VND monthly from age 25-35 (total 240M VND invested). At 6% annual return, she has 1.2B VND at retirement. If she started at 35, she\'d need to save 4M VND monthly to reach the same amount.',
-      commonMistakes: [
-        'Waiting to start saving until you have "enough" money',
-        'Not understanding how credit card interest compounds against you',
-        'Focusing only on interest rates without considering fees',
-        'Withdrawing savings early and losing compound growth',
-        'Not taking advantage of employer retirement matching'
-      ],
-      actionSteps: [
-        'Calculate compound interest on your current savings',
-        'Set up automatic monthly savings transfers',
-        'Pay off high-interest debt first',
-        'Research high-yield savings accounts',
-        'Start investing in index funds for long-term growth'
-      ],
-      reward: 180,
-      completed: false
-    },
-    {
-      id: '4',
-      title: 'Smart Credit Card Management',
-      category: 'borrowing',
-      difficulty: 'intermediate',
-      content: 'Credit cards can be powerful financial tools when used responsibly, but dangerous when mismanaged. Understanding how to use credit cards wisely can help build credit history and earn rewards while avoiding debt traps.',
-      keyPoints: [
-        'Pay full balance every month to avoid interest charges',
-        'Keep credit utilization below 30% of credit limit',
-        'Never use credit cards for cash advances (high fees)',
-        'Understand the difference between statement balance and current balance',
-        'Use credit cards for planned purchases, not impulse buying'
-      ],
-      practicalExercise: 'Track all credit card purchases for one month. Calculate how much interest you would pay if you only made minimum payments.',
-      realWorldExample: 'Tuan has a 10M VND credit limit and keeps his balance under 3M VND (30% utilization). He pays the full balance monthly, earns 2% cashback, and builds excellent credit history without paying any interest.',
-      commonMistakes: [
-        'Making only minimum payments and paying high interest',
-        'Using credit cards for cash advances',
-        'Opening too many credit cards at once',
-        'Maxing out credit limits',
-        'Not reading credit card terms and conditions'
-      ],
-      actionSteps: [
-        'Set up automatic full balance payments',
-        'Monitor credit utilization monthly',
-        'Choose cards with rewards that match your spending',
-        'Read all terms and conditions carefully',
-        'Check credit reports regularly for errors'
-      ],
-      reward: 220,
-      completed: false
-    },
-    {
-      id: '5',
-      title: 'Loan Comparison and Smart Borrowing',
-      category: 'borrowing',
-      difficulty: 'advanced',
-      content: 'Not all loans are created equal. Understanding different loan types, interest rates, terms, and fees helps you make smart borrowing decisions and save thousands of dollars over the loan lifetime.',
-      keyPoints: [
-        'APR (Annual Percentage Rate) includes interest rate plus fees',
-        'Shorter loan terms mean higher monthly payments but less total interest',
-        'Fixed rates stay the same, variable rates can change',
-        'Secured loans (with collateral) typically have lower rates',
-        'Your credit score significantly affects loan terms and rates'
-      ],
-      practicalExercise: 'Compare a 5-year vs 7-year car loan for 500M VND at 8% interest. Calculate the difference in monthly payments and total interest paid.',
-      realWorldExample: 'Hoa needs 500M VND for a car. A 5-year loan costs 10.1M VND monthly with 105M VND total interest. A 7-year loan costs 7.8M VND monthly but 155M VND total interest - 50M VND more!',
-      commonMistakes: [
-        'Focusing only on monthly payment, not total cost',
-        'Not shopping around for better rates',
-        'Taking longer loan terms to lower monthly payments',
-        'Not reading loan terms and conditions carefully',
-        'Borrowing more than necessary because you qualify'
-      ],
-      actionSteps: [
-        'Check your credit score before applying',
-        'Get quotes from at least 3 different lenders',
-        'Calculate total interest cost, not just monthly payments',
-        'Consider making extra principal payments',
-        'Read all loan documents carefully before signing'
-      ],
-      reward: 250,
-      completed: false
-    },
-    {
-      id: '6',
-      title: 'Cash Flow Management and Working Capital',
-      category: 'planning',
-      difficulty: 'advanced',
-      content: 'Cash flow is the movement of money in and out of your accounts. Positive cash flow means you earn more than you spend. Managing cash flow helps ensure you can pay bills on time and avoid debt.',
-      keyPoints: [
-        'Track income and expenses monthly to understand cash flow patterns',
-        'Plan for irregular expenses like insurance, taxes, and maintenance',
-        'Maintain working capital (cash buffer) for smooth operations',
-        'Time large purchases with income cycles',
-        'Use cash flow forecasting to plan major financial decisions'
-      ],
-      practicalExercise: 'Create a 6-month cash flow forecast including your regular income, fixed expenses, and planned large purchases.',
-      realWorldExample: 'Minh is a freelancer with irregular income. He tracks cash flow monthly and keeps 2 months of expenses in checking account to handle income fluctuations and pay bills on time.',
-      commonMistakes: [
-        'Not planning for irregular but predictable expenses',
-        'Spending money as soon as it arrives',
-        'Not maintaining adequate cash reserves',
-        'Making large purchases without considering cash flow impact',
-        'Ignoring seasonal income or expense patterns'
-      ],
-      actionSteps: [
-        'Track all income and expenses for 3 months',
-        'Identify patterns in your cash flow',
-        'Plan for irregular expenses by saving monthly',
-        'Maintain 1-2 months expenses in checking account',
-        'Review and adjust cash flow plan quarterly'
-      ],
-      reward: 300,
-      completed: false
-    },
-    {
-      id: '7',
-      title: 'Investment Account Types and Tax Benefits',
-      category: 'investing',
-      difficulty: 'advanced',
-      content: 'Different investment accounts offer various tax benefits and restrictions. Understanding these can help you maximize returns and minimize taxes on your investments.',
-      keyPoints: [
-        'Regular investment accounts: Taxed on dividends and capital gains',
-        'Retirement accounts: Tax-deferred growth until withdrawal',
-        'Education savings accounts: Tax-free growth for education expenses',
-        'Health savings accounts: Triple tax benefit (deduct, grow, withdraw tax-free)',
-        'Employer matching is free money - always contribute enough to get full match'
-      ],
-      practicalExercise: 'Calculate the tax savings of contributing 2M VND monthly to a retirement account vs regular investment account over 20 years.',
-      realWorldExample: 'An earns 25M VND monthly and contributes 2M VND to retirement account. This reduces her taxable income by 24M VND annually, saving 4.8M VND in taxes while building retirement wealth.',
-      commonMistakes: [
-        'Not taking advantage of employer retirement matching',
-        'Withdrawing from retirement accounts early and paying penalties',
-        'Not understanding tax implications of different account types',
-        'Putting all investments in taxable accounts',
-        'Not maximizing tax-advantaged account contributions'
-      ],
-      actionSteps: [
-        'Contribute enough to get full employer match',
-        'Maximize retirement account contributions',
-        'Consider tax-loss harvesting in taxable accounts',
-        'Understand withdrawal rules for each account type',
-        'Consult tax professional for complex situations'
-      ],
-      reward: 350,
-      completed: false
-    },
-    {
-      id: '8',
-      title: 'Debt Consolidation and Payoff Strategies',
-      category: 'borrowing',
-      difficulty: 'intermediate',
-      content: 'When you have multiple debts, strategic payoff methods can save money and reduce stress. Understanding debt consolidation and payoff strategies helps you become debt-free faster.',
-      keyPoints: [
-        'Debt avalanche: Pay minimums on all debts, extra on highest interest rate',
-        'Debt snowball: Pay minimums on all debts, extra on smallest balance',
-        'Debt consolidation: Combine multiple debts into one lower-rate loan',
-        'Balance transfers: Move high-rate credit card debt to lower-rate cards',
-        'Never ignore debt - it compounds quickly'
-      ],
-      practicalExercise: 'Compare debt avalanche vs snowball methods for paying off 3 different debts totaling 50M VND.',
-      realWorldExample: 'Quan has 3 credit cards with 15M, 8M, and 5M VND balances at different interest rates. Using debt avalanche method, he saves 2.5M VND in interest compared to making minimum payments.',
-      commonMistakes: [
-        'Making only minimum payments on high-interest debt',
-        'Taking on new debt while paying off existing debt',
-        'Not considering debt consolidation options',
-        'Closing credit cards immediately after paying them off',
-        'Not addressing the spending habits that created debt'
-      ],
-      actionSteps: [
-        'List all debts with balances, rates, and minimum payments',
-        'Choose debt avalanche or snowball method',
-        'Consider debt consolidation if it lowers overall rate',
-        'Stop using credit cards until debt is paid off',
-        'Create a realistic debt payoff timeline'
-      ],
-      reward: 280,
-      completed: false
-    }
-  ];
-
-  const loanScenarios: LoanScenario[] = [
-    {
-      id: '1',
-      title: 'First Car Purchase Decision',
-      amount: 400000000, // 400M VND
-      purpose: 'Buy your first car for commuting to work',
-      options: [
-        {
-          bank: 'Vietcombank Auto Loan',
-          interestRate: 8.5,
-          term: 5,
-          monthlyPayment: 8200000,
-          totalCost: 492000000,
-          pros: ['Low interest rate', 'Established bank', 'Good customer service'],
-          cons: ['Strict requirements', 'Higher monthly payment', 'Processing fees']
-        },
-        {
-          bank: 'BIDV Quick Auto Loan',
-          interestRate: 9.8,
-          term: 7,
-          monthlyPayment: 6800000,
-          totalCost: 571200000,
-          pros: ['Lower monthly payment', 'Fast approval', 'Flexible requirements'],
-          cons: ['Higher total cost', 'Variable interest rate', 'Longer commitment']
-        },
-        {
-          bank: 'Personal Loan (Any Purpose)',
-          interestRate: 15.5,
-          term: 5,
-          monthlyPayment: 9600000,
-          totalCost: 576000000,
-          pros: ['No collateral required', 'Use for any purpose', 'Quick approval'],
-          cons: ['Highest interest rate', 'Highest monthly payment', 'Highest total cost']
-        }
-      ],
-      bestChoice: 0,
-      explanation: 'Vietcombank offers the lowest total cost despite higher monthly payments. The 92M VND savings over the loan term is significant.',
-      reward: 200
-    },
-    {
-      id: '2',
-      title: 'Home Purchase Mortgage Decision',
-      amount: 2000000000, // 2B VND
-      purpose: 'Buy your first apartment in Ho Chi Minh City',
-      options: [
-        {
-          bank: 'VietinBank Fixed Rate Mortgage',
-          interestRate: 7.8,
-          term: 20,
-          monthlyPayment: 16800000,
-          totalCost: 4032000000,
-          pros: ['Fixed rate security', 'Predictable payments', 'No rate increase risk'],
-          cons: ['Higher initial rate', 'Less flexibility', 'Prepayment penalties']
-        },
-        {
-          bank: 'Techcombank Variable Rate Mortgage',
-          interestRate: 6.5,
-          term: 25,
-          monthlyPayment: 14200000,
-          totalCost: 4260000000,
-          pros: ['Lower initial rate', 'Lower monthly payment', 'Rate may decrease'],
-          cons: ['Rate uncertainty', 'Longer commitment', 'Higher total cost if rates rise']
-        },
-        {
-          bank: 'ACB Hybrid Mortgage (5yr fixed, then variable)',
-          interestRate: 7.2,
-          term: 20,
-          monthlyPayment: 15900000,
-          totalCost: 3816000000,
-          pros: ['Balanced approach', 'Initial rate protection', 'Lowest total cost'],
-          cons: ['Rate uncertainty after 5 years', 'Complex structure', 'Refinancing needed']
-        }
-      ],
-      bestChoice: 2,
-      explanation: 'ACB Hybrid offers the best balance of rate protection and total cost, saving 216M VND compared to VietinBank.',
-      reward: 300
-    }
-  ];
-
-  const [cashFlowData, setCashFlowData] = useState({
-    income: {
-      salary: 15000000,
-      freelance: 2000000,
-      investments: 500000,
-      other: 0
-    },
-    expenses: {
-      housing: 7500000,
-      food: 3000000,
-      transportation: 1500000,
-      utilities: 800000,
-      entertainment: 1500000,
-      savings: 3000000,
-      other: 1200000
-    }
+  const [activeGame, setActiveGame] = useState<'overview' | 'lessons' | 'budgeting' | 'loans' | 'calculator' | 'products' | 'cashflow'>('overview');
+  const [selectedLesson, setSelectedLesson] = useState<BankingLesson | null>(null);
+  const [budget, setBudget] = useState({
+    income: 25000000, // 25M VND monthly
+    categories: [
+      { name: 'Housing', allocated: 8000000, spent: 7500000, remaining: 500000, color: 'bg-blue-400', tips: ['Consider roommates to split costs', 'Look for locations with good public transport'] },
+      { name: 'Food', allocated: 5000000, spent: 4200000, remaining: 800000, color: 'bg-green-400', tips: ['Cook at home more often', 'Buy groceries in bulk'] },
+      { name: 'Transportation', allocated: 3000000, spent: 2800000, remaining: 200000, color: 'bg-yellow-400', tips: ['Use public transport', 'Consider motorbike vs car costs'] },
+      { name: 'Entertainment', allocated: 2000000, spent: 2500000, remaining: -500000, color: 'bg-purple-400', tips: ['Set entertainment limits', 'Find free activities'] },
+      { name: 'Savings', allocated: 5000000, spent: 4000000, remaining: 1000000, color: 'bg-cyan-400', tips: ['Automate savings transfers', 'Start with 20% of income'] },
+      { name: 'Emergency Fund', allocated: 2000000, spent: 1500000, remaining: 500000, color: 'bg-red-400', tips: ['Build 6 months of expenses', 'Keep in high-yield savings'] }
+    ] as BudgetCategory[]
   });
 
-  const totalIncome = Object.values(cashFlowData.income).reduce((sum, val) => sum + val, 0);
-  const totalExpenses = Object.values(cashFlowData.expenses).reduce((sum, val) => sum + val, 0);
-  const netCashFlow = totalIncome - totalExpenses;
+  const [cashFlowData, setCashFlowData] = useState({
+    monthlyIncome: 25000000,
+    fixedExpenses: 15000000,
+    variableExpenses: 6000000,
+    savings: 4000000,
+    netCashFlow: 0
+  });
 
-  const completeLesson = (lesson: FinancialLesson) => {
-    addCoins(lesson.reward);
-    updateProgress({ 
-      financialLiteracyScore: progress.financialLiteracyScore + (lesson.difficulty === 'advanced' ? 25 : lesson.difficulty === 'intermediate' ? 15 : 10)
-    });
-    
-    // Mark lesson as completed
-    setSelectedLesson(null);
-  };
-
-  const solveLoanScenario = (scenario: LoanScenario, chosenOption: number) => {
-    const isCorrect = chosenOption === scenario.bestChoice;
-    
-    if (isCorrect) {
-      addCoins(scenario.reward);
-      updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 20 });
-    } else {
-      addCoins(-50);
+  const bankingLessons: BankingLesson[] = [
+    {
+      id: '1',
+      title: 'Understanding Cash Flow Management',
+      category: 'basics',
+      content: 'Cash flow is the movement of money in and out of your accounts. Positive cash flow means you earn more than you spend, while negative cash flow means you spend more than you earn.',
+      keyPoints: [
+        'Cash flow = Income - Expenses',
+        'Track both fixed and variable expenses',
+        'Positive cash flow enables savings and investments',
+        'Negative cash flow leads to debt accumulation',
+        'Cash flow timing affects your financial stability'
+      ],
+      practicalTips: [
+        'Use the 50/30/20 rule: 50% needs, 30% wants, 20% savings',
+        'Track expenses for 30 days to understand spending patterns',
+        'Set up automatic transfers to savings accounts',
+        'Review and adjust budget monthly',
+        'Build emergency fund before investing'
+      ],
+      realExamples: [
+        'Young professional earning 25M VND: 15M fixed costs, 6M variable, 4M savings = healthy cash flow',
+        'Student with part-time job: 8M income, 10M expenses = need to reduce spending or increase income',
+        'Family with irregular income: Track monthly averages and build larger emergency fund'
+      ],
+      commonMistakes: [
+        'Not tracking small daily expenses that add up',
+        'Forgetting about annual or quarterly expenses',
+        'Not adjusting budget when income changes',
+        'Spending savings on non-emergencies',
+        'Not planning for irregular income periods'
+      ],
+      reward: 150,
+      completed: false,
+      difficulty: 'beginner',
+      estimatedTime: '15 minutes'
+    },
+    {
+      id: '2',
+      title: 'Working Capital and Business Finance',
+      category: 'advanced',
+      content: 'Working capital is the money available for day-to-day operations. For personal finance, it\'s your liquid assets minus short-term debts.',
+      keyPoints: [
+        'Working Capital = Current Assets - Current Liabilities',
+        'Positive working capital indicates financial health',
+        'Liquidity ratios measure ability to pay short-term debts',
+        'Cash conversion cycle affects cash flow timing',
+        'Working capital management prevents cash crunches'
+      ],
+      practicalTips: [
+        'Maintain 3-6 months of expenses in liquid savings',
+        'Pay off high-interest debt to improve working capital',
+        'Use credit cards wisely to manage cash flow timing',
+        'Negotiate payment terms with service providers',
+        'Monitor debt-to-income ratio monthly'
+      ],
+      realExamples: [
+        'Freelancer with irregular income: Keeps 6 months expenses in savings for cash flow stability',
+        'Small business owner: Uses business credit line to manage seasonal cash flow gaps',
+        'Young professional: Pays off credit card debt to improve personal working capital'
+      ],
+      commonMistakes: [
+        'Tying up too much money in illiquid investments',
+        'Not planning for irregular expenses',
+        'Using emergency fund for non-emergencies',
+        'Ignoring the timing of income and expenses',
+        'Not maintaining adequate cash reserves'
+      ],
+      reward: 200,
+      completed: false,
+      difficulty: 'advanced',
+      estimatedTime: '25 minutes'
+    },
+    {
+      id: '3',
+      title: 'Interest Rates and Compound Growth',
+      category: 'basics',
+      content: 'Interest is the cost of borrowing money or the reward for saving. Compound interest is when you earn interest on both your principal and previously earned interest.',
+      keyPoints: [
+        'Simple Interest = Principal × Rate × Time',
+        'Compound Interest = Principal × (1 + Rate)^Time',
+        'Higher interest rates significantly impact long-term growth',
+        'Compounding frequency affects total returns',
+        'Time is the most powerful factor in compound growth'
+      ],
+      practicalTips: [
+        'Start investing early to maximize compound growth',
+        'Choose high-yield savings accounts for emergency funds',
+        'Pay off high-interest debt before investing',
+        'Reinvest dividends and interest for compound growth',
+        'Use compound interest calculators for planning'
+      ],
+      realExamples: [
+        'Saving 2M VND monthly at 6% annual return = 26.8M after 1 year, 58.7M after 2 years',
+        'Credit card debt at 24% APR: 10M debt becomes 12.4M in one year if only minimum payments',
+        'Starting investment at age 25 vs 35: 10 extra years can double retirement savings'
+      ],
+      commonMistakes: [
+        'Not starting early enough to benefit from compounding',
+        'Withdrawing investment gains instead of reinvesting',
+        'Focusing on interest rate while ignoring fees',
+        'Not comparing APR vs APY correctly',
+        'Underestimating the power of consistent small investments'
+      ],
+      reward: 120,
+      completed: false,
+      difficulty: 'beginner',
+      estimatedTime: '20 minutes'
+    },
+    {
+      id: '4',
+      title: 'Debit vs Credit: Smart Payment Strategies',
+      category: 'products',
+      content: 'Debit cards use your own money directly from your bank account, while credit cards let you borrow money that you must pay back later.',
+      keyPoints: [
+        'Debit cards prevent overspending but offer less protection',
+        'Credit cards provide fraud protection and build credit history',
+        'Credit utilization affects your credit score',
+        'Payment timing impacts interest charges',
+        'Different cards offer different rewards and benefits'
+      ],
+      practicalTips: [
+        'Use credit cards for online purchases for better protection',
+        'Keep credit utilization below 30% of limit',
+        'Pay credit card balances in full each month',
+        'Use debit cards for cash withdrawals and small purchases',
+        'Monitor both accounts regularly for unauthorized transactions'
+      ],
+      realExamples: [
+        'Online shopping: Credit card offers dispute protection if merchant doesn\'t deliver',
+        'ATM withdrawals: Debit card avoids cash advance fees that credit cards charge',
+        'Building credit: Responsible credit card use improves credit score for future loans'
+      ],
+      commonMistakes: [
+        'Using credit cards like free money',
+        'Only making minimum payments on credit cards',
+        'Not monitoring credit utilization ratio',
+        'Using debit cards for online purchases without protection',
+        'Not taking advantage of credit card rewards and benefits'
+      ],
+      reward: 100,
+      completed: false,
+      difficulty: 'beginner',
+      estimatedTime: '15 minutes'
+    },
+    {
+      id: '5',
+      title: 'Advanced Investment Portfolio Diversification',
+      category: 'advanced',
+      content: 'Diversification spreads investment risk across different asset classes, sectors, and geographic regions to protect against market volatility.',
+      keyPoints: [
+        'Don\'t put all eggs in one basket',
+        'Asset allocation should match risk tolerance and timeline',
+        'Geographic diversification reduces country-specific risks',
+        'Sector diversification protects against industry downturns',
+        'Rebalancing maintains target allocation percentages'
+      ],
+      practicalTips: [
+        'Use index funds for instant diversification',
+        'Allocate across stocks, bonds, real estate, commodities',
+        'Consider international markets for geographic diversity',
+        'Rebalance portfolio quarterly or when allocations drift 5%+',
+        'Adjust allocation as you age (more conservative over time)'
+      ],
+      realExamples: [
+        'Young investor (25): 80% stocks, 15% bonds, 5% alternatives',
+        'Mid-career (40): 60% stocks, 30% bonds, 10% real estate',
+        'Pre-retirement (55): 40% stocks, 50% bonds, 10% cash/alternatives'
+      ],
+      commonMistakes: [
+        'Over-concentrating in familiar companies or sectors',
+        'Chasing last year\'s best-performing investments',
+        'Not rebalancing when allocations drift significantly',
+        'Ignoring correlation between different investments',
+        'Making emotional decisions during market volatility'
+      ],
+      reward: 250,
+      completed: false,
+      difficulty: 'advanced',
+      estimatedTime: '30 minutes'
+    },
+    {
+      id: '6',
+      title: 'Smart Borrowing and Debt Management',
+      category: 'planning',
+      content: 'Smart borrowing involves understanding different types of debt, interest rates, and repayment strategies to minimize costs and build wealth.',
+      keyPoints: [
+        'Good debt helps build wealth (mortgages, education loans)',
+        'Bad debt drains wealth (high-interest consumer debt)',
+        'Debt-to-income ratio should stay below 36%',
+        'Interest rates vary significantly between loan types',
+        'Early repayment can save thousands in interest'
+      ],
+      practicalTips: [
+        'Pay off highest interest rate debts first',
+        'Consider debt consolidation for multiple high-rate debts',
+        'Make extra principal payments when possible',
+        'Shop around for best interest rates and terms',
+        'Understand all fees and penalties before borrowing'
+      ],
+      realExamples: [
+        'Mortgage at 8% APR vs personal loan at 18% APR: prioritize personal loan payoff',
+        'Student loan at 6% vs investment return at 8%: invest while making minimum payments',
+        'Credit card debt at 24% APR: pay off immediately before any other investments'
+      ],
+      commonMistakes: [
+        'Only making minimum payments on high-interest debt',
+        'Not shopping around for better interest rates',
+        'Using home equity for consumer purchases',
+        'Ignoring loan fees and penalties',
+        'Not having a clear debt payoff strategy'
+      ],
+      reward: 180,
+      completed: false,
+      difficulty: 'intermediate',
+      estimatedTime: '25 minutes'
     }
-    
-    setSelectedLoanScenario(null);
+  ];
+
+  const loanProducts: LoanProduct[] = [
+    {
+      id: '1',
+      name: 'Personal Loan',
+      type: 'personal',
+      interestRate: 15.5,
+      maxAmount: 500000000,
+      term: '1-5 years',
+      requirements: ['Stable income for 6+ months', 'Credit score 650+', 'Debt-to-income < 40%'],
+      pros: ['No collateral required', 'Quick approval process', 'Flexible use of funds'],
+      cons: ['Higher interest rates', 'Shorter repayment terms', 'Strict income requirements'],
+      bestFor: 'Debt consolidation, emergency expenses, home improvements',
+      realExample: 'Borrow 100M VND at 15.5% for 3 years = monthly payment 3.5M VND, total interest 26M VND'
+    },
+    {
+      id: '2',
+      name: 'Home Mortgage',
+      type: 'mortgage',
+      interestRate: 8.2,
+      maxAmount: 5000000000,
+      term: '15-30 years',
+      requirements: ['20% down payment', 'Stable employment 2+ years', 'Debt-to-income < 28%'],
+      pros: ['Lower interest rates', 'Long repayment terms', 'Tax deductions available'],
+      cons: ['Requires large down payment', 'Property as collateral', 'Closing costs and fees'],
+      bestFor: 'Purchasing primary residence or investment property',
+      realExample: 'Borrow 2B VND at 8.2% for 20 years = monthly payment 16.8M VND, total interest 2.03B VND'
+    },
+    {
+      id: '3',
+      name: 'Auto Loan',
+      type: 'auto',
+      interestRate: 12.0,
+      maxAmount: 1500000000,
+      term: '3-7 years',
+      requirements: ['Valid driver license', 'Insurance coverage', 'Stable income'],
+      pros: ['Lower rates than personal loans', 'Vehicle as collateral', 'Build credit history'],
+      cons: ['Vehicle depreciates rapidly', 'Gap insurance needed', 'Repossession risk'],
+      bestFor: 'Purchasing reliable transportation for work',
+      realExample: 'Borrow 800M VND at 12% for 5 years = monthly payment 17.8M VND, total interest 267M VND'
+    },
+    {
+      id: '4',
+      name: 'Business Loan',
+      type: 'business',
+      interestRate: 10.5,
+      maxAmount: 2000000000,
+      term: '1-10 years',
+      requirements: ['Business plan', '2+ years operation', 'Financial statements', 'Collateral'],
+      pros: ['Lower rates for secured loans', 'Tax deductible interest', 'Build business credit'],
+      cons: ['Strict qualification requirements', 'Personal guarantees often required', 'Collateral at risk'],
+      bestFor: 'Business expansion, equipment purchase, working capital',
+      realExample: 'Borrow 500M VND at 10.5% for 7 years = monthly payment 8.2M VND, total interest 192M VND'
+    }
+  ];
+
+  const creditCards: CreditCard[] = [
+    {
+      id: '1',
+      name: 'Vietcombank Basic Card',
+      type: 'basic',
+      apr: 24.0,
+      annualFee: 0,
+      rewards: 'No rewards program',
+      benefits: ['No annual fee', 'Basic fraud protection', 'Online banking access'],
+      requirements: ['Monthly income 8M+ VND', 'Age 18-65', 'Valid ID'],
+      pros: ['No annual fee', 'Easy approval', 'Good for building credit'],
+      cons: ['High APR', 'No rewards', 'Low credit limit'],
+      bestFor: 'First-time credit card users, building credit history'
+    },
+    {
+      id: '2',
+      name: 'BIDV Rewards Card',
+      type: 'rewards',
+      apr: 22.5,
+      annualFee: 500000,
+      rewards: '1% cashback on all purchases, 2% on dining',
+      benefits: ['Cashback rewards', 'Travel insurance', 'Purchase protection', 'Extended warranty'],
+      requirements: ['Monthly income 15M+ VND', 'Good credit score', 'Bank relationship'],
+      pros: ['Earn rewards on spending', 'Good benefits package', 'Moderate APR'],
+      cons: ['Annual fee', 'Higher income requirement', 'Rewards caps'],
+      bestFor: 'Regular spenders who pay balances in full'
+    },
+    {
+      id: '3',
+      name: 'Techcombank Premium Card',
+      type: 'premium',
+      apr: 20.0,
+      annualFee: 2000000,
+      rewards: '2% cashback, 3% on travel, 5% on luxury purchases',
+      benefits: ['Airport lounge access', 'Concierge service', 'Premium travel insurance', 'No foreign transaction fees'],
+      requirements: ['Monthly income 50M+ VND', 'Excellent credit', 'High net worth'],
+      pros: ['Excellent rewards', 'Premium benefits', 'Lower APR', 'High credit limits'],
+      cons: ['High annual fee', 'Strict requirements', 'Temptation to overspend'],
+      bestFor: 'High-income individuals with significant spending'
+    }
+  ];
+
+  useEffect(() => {
+    const netFlow = cashFlowData.monthlyIncome - cashFlowData.fixedExpenses - cashFlowData.variableExpenses;
+    setCashFlowData(prev => ({ ...prev, netCashFlow: netFlow }));
+  }, [cashFlowData.monthlyIncome, cashFlowData.fixedExpenses, cashFlowData.variableExpenses]);
+
+  const completeLesson = (lessonId: string) => {
+    const lesson = bankingLessons.find(l => l.id === lessonId);
+    if (lesson && !lesson.completed) {
+      addCoins(lesson.reward);
+      updateProgress({ 
+        financialLiteracyScore: progress.financialLiteracyScore + (lesson.difficulty === 'advanced' ? 25 : lesson.difficulty === 'intermediate' ? 15 : 10)
+      });
+      
+      // Mark lesson as completed
+      const updatedLessons = bankingLessons.map(l => 
+        l.id === lessonId ? { ...l, completed: true } : l
+      );
+    }
   };
-
-  const renderBudgetingGame = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <Calculator className="mx-auto mb-4 text-blue-400" size={64} />
-        <h2 className="text-2xl font-bold text-white mb-2">Advanced Budgeting Simulator</h2>
-        <p className="text-blue-200">Master the 50/30/20 rule and optimize your spending</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-            <h3 className="text-white font-semibold mb-4">Monthly Income</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-purple-200">After-tax Income:</span>
-                <input
-                  type="number"
-                  value={monthlyIncome}
-                  onChange={(e) => setMonthlyIncome(Number(e.target.value))}
-                  className="bg-white/20 text-white px-3 py-1 rounded w-32 text-right"
-                />
-              </div>
-              <div className="text-sm text-purple-300">
-                Recommended allocation: 50% needs, 30% wants, 20% savings
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-            <h3 className="text-white font-semibold mb-4">Budget Categories</h3>
-            <div className="space-y-4">
-              {budgetData.map((category, index) => {
-                const percentage = (category.allocated / monthlyIncome) * 100;
-                const spentPercentage = (category.spent / category.allocated) * 100;
-                
-                return (
-                  <div key={index} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-white font-medium">{category.name}</span>
-                      <span className="text-purple-300 text-sm">{percentage.toFixed(1)}%</span>
-                    </div>
-                    
-                    <div className="w-full bg-gray-700/30 rounded-full h-4 relative">
-                      <div 
-                        className={`${category.color} h-4 rounded-full transition-all duration-500`}
-                        style={{ width: `${Math.min(spentPercentage, 100)}%` }}
-                      />
-                      {spentPercentage > 100 && (
-                        <div className="absolute top-0 left-0 w-full h-4 bg-red-500/50 rounded-full" />
-                      )}
-                    </div>
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-purple-200">
-                        Spent: {category.spent.toLocaleString()} VND
-                      </span>
-                      <span className={`font-medium ${
-                        category.remaining >= 0 ? 'text-green-400' : 'text-red-400'
-                      }`}>
-                        {category.remaining >= 0 ? 'Under' : 'Over'}: {Math.abs(category.remaining).toLocaleString()} VND
-                      </span>
-                    </div>
-
-                    {category.remaining < 0 && (
-                      <div className="bg-red-500/20 border border-red-500/30 rounded p-2">
-                        <h4 className="text-red-300 font-medium text-sm mb-1">💡 Money-Saving Tips:</h4>
-                        <ul className="text-red-200 text-xs space-y-1">
-                          {category.tips.map((tip, tipIndex) => (
-                            <li key={tipIndex}>• {tip}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-            <h3 className="text-white font-semibold mb-4">Budget Analysis</h3>
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-blue-400">{((budgetData.reduce((sum, cat) => sum + cat.allocated, 0) / monthlyIncome) * 100).toFixed(0)}%</div>
-                  <div className="text-blue-200 text-sm">Budgeted</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-400">{((budgetData.reduce((sum, cat) => sum + cat.spent, 0) / monthlyIncome) * 100).toFixed(0)}%</div>
-                  <div className="text-purple-200 text-sm">Spent</div>
-                </div>
-                <div>
-                  <div className={`text-2xl font-bold ${netCashFlow >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {((monthlyIncome - budgetData.reduce((sum, cat) => sum + cat.spent, 0)) / monthlyIncome * 100).toFixed(0)}%
-                  </div>
-                  <div className={`text-sm ${netCashFlow >= 0 ? 'text-green-200' : 'text-red-200'}`}>
-                    {netCashFlow >= 0 ? 'Surplus' : 'Deficit'}
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-white/20 pt-4">
-                <h4 className="text-white font-medium mb-3">Budget Recommendations:</h4>
-                <div className="space-y-2 text-sm">
-                  {budgetData.some(cat => cat.remaining < 0) && (
-                    <div className="bg-red-500/20 border border-red-500/30 rounded p-3">
-                      <div className="text-red-300 font-medium mb-1">⚠️ Over Budget Categories:</div>
-                      <ul className="text-red-200 space-y-1">
-                        {budgetData.filter(cat => cat.remaining < 0).map((cat, index) => (
-                          <li key={index}>• {cat.name}: {Math.abs(cat.remaining).toLocaleString()} VND over</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {netCashFlow > 0 && (
-                    <div className="bg-green-500/20 border border-green-500/30 rounded p-3">
-                      <div className="text-green-300 font-medium mb-1">✅ Great Job! You have surplus:</div>
-                      <p className="text-green-200">Consider increasing savings or investing the extra {netCashFlow.toLocaleString()} VND</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-            <h3 className="text-white font-semibold mb-4">50/30/20 Rule Analysis</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-purple-200">Needs (50%):</span>
-                <div className="text-right">
-                  <div className="text-white font-semibold">{(monthlyIncome * 0.5).toLocaleString()} VND</div>
-                  <div className="text-purple-300 text-sm">Target allocation</div>
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-purple-200">Wants (30%):</span>
-                <div className="text-right">
-                  <div className="text-white font-semibold">{(monthlyIncome * 0.3).toLocaleString()} VND</div>
-                  <div className="text-purple-300 text-sm">Target allocation</div>
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-purple-200">Savings (20%):</span>
-                <div className="text-right">
-                  <div className="text-white font-semibold">{(monthlyIncome * 0.2).toLocaleString()} VND</div>
-                  <div className="text-purple-300 text-sm">Target allocation</div>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                addCoins(100);
-                updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 15 });
-              }}
-              className="w-full mt-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-cyan-700 transition-colors"
-            >
-              Optimize Budget (+100 coins)
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderCashFlowGame = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <Activity className="mx-auto mb-4 text-green-400" size={64} />
-        <h2 className="text-2xl font-bold text-white mb-2">Cash Flow Management</h2>
-        <p className="text-green-200">Track money in and out to maintain financial health</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-          <h3 className="text-white font-semibold mb-4 flex items-center">
-            <TrendingUp className="mr-2 text-green-400" size={20} />
-            Monthly Income Sources
-          </h3>
-          <div className="space-y-3">
-            {Object.entries(cashFlowData.income).map(([key, value]) => (
-              <div key={key} className="flex justify-between items-center">
-                <span className="text-purple-200 capitalize">{key}:</span>
-                <input
-                  type="number"
-                  value={value}
-                  onChange={(e) => setCashFlowData(prev => ({
-                    ...prev,
-                    income: { ...prev.income, [key]: Number(e.target.value) }
-                  }))}
-                  className="bg-white/20 text-white px-3 py-1 rounded w-32 text-right"
-                />
-              </div>
-            ))}
-            <div className="border-t border-white/20 pt-3">
-              <div className="flex justify-between font-semibold">
-                <span className="text-green-300">Total Income:</span>
-                <span className="text-green-400">{totalIncome.toLocaleString()} VND</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-          <h3 className="text-white font-semibold mb-4 flex items-center">
-            <TrendingDown className="mr-2 text-red-400" size={20} />
-            Monthly Expenses
-          </h3>
-          <div className="space-y-3">
-            {Object.entries(cashFlowData.expenses).map(([key, value]) => (
-              <div key={key} className="flex justify-between items-center">
-                <span className="text-purple-200 capitalize">{key}:</span>
-                <input
-                  type="number"
-                  value={value}
-                  onChange={(e) => setCashFlowData(prev => ({
-                    ...prev,
-                    expenses: { ...prev.expenses, [key]: Number(e.target.value) }
-                  }))}
-                  className="bg-white/20 text-white px-3 py-1 rounded w-32 text-right"
-                />
-              </div>
-            ))}
-            <div className="border-t border-white/20 pt-3">
-              <div className="flex justify-between font-semibold">
-                <span className="text-red-300">Total Expenses:</span>
-                <span className="text-red-400">{totalExpenses.toLocaleString()} VND</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-        <h3 className="text-white font-semibold mb-4">Cash Flow Analysis</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-400">{totalIncome.toLocaleString()}</div>
-            <div className="text-green-200 text-sm">Total Income</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-red-400">{totalExpenses.toLocaleString()}</div>
-            <div className="text-red-200 text-sm">Total Expenses</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-2xl font-bold ${netCashFlow >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {netCashFlow.toLocaleString()}
-            </div>
-            <div className={`text-sm ${netCashFlow >= 0 ? 'text-green-200' : 'text-red-200'}`}>
-              Net Cash Flow
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <div className="w-full bg-gray-700/30 rounded-full h-4 relative">
-            <div 
-              className="bg-green-400 h-4 rounded-full transition-all duration-500"
-              style={{ width: `${Math.min((totalIncome / (totalIncome + Math.abs(Math.min(netCashFlow, 0)))) * 100, 100)}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-xs text-purple-300 mt-1">
-            <span>Deficit</span>
-            <span>Balanced</span>
-            <span>Surplus</span>
-          </div>
-        </div>
-
-        {netCashFlow < 0 && (
-          <div className="mt-4 bg-red-500/20 border border-red-500/30 rounded-lg p-4">
-            <h4 className="text-red-300 font-semibold mb-2">⚠️ Budget Deficit Solutions:</h4>
-            <ul className="text-red-200 text-sm space-y-1">
-              <li>• Reduce entertainment and dining out expenses</li>
-              <li>• Find additional income sources (freelance, part-time)</li>
-              <li>• Negotiate lower rent or find cheaper housing</li>
-              <li>• Use public transportation instead of private vehicle</li>
-              <li>• Cook meals at home instead of eating out</li>
-            </ul>
-          </div>
-        )}
-
-        {netCashFlow > 0 && (
-          <div className="mt-4 bg-green-500/20 border border-green-500/30 rounded-lg p-4">
-            <h4 className="text-green-300 font-semibold mb-2">✅ Surplus Optimization Ideas:</h4>
-            <ul className="text-green-200 text-sm space-y-1">
-              <li>• Increase emergency fund to 6 months expenses</li>
-              <li>• Invest in index funds for long-term growth</li>
-              <li>• Pay extra on high-interest debt</li>
-              <li>• Consider additional retirement contributions</li>
-              <li>• Save for major goals (house down payment, education)</li>
-            </ul>
-          </div>
-        )}
-
-        <button
-          onClick={() => {
-            addCoins(150);
-            updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 20 });
-          }}
-          className="w-full mt-4 bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-green-700 hover:to-blue-700 transition-colors"
-        >
-          Analyze Cash Flow (+150 coins)
-        </button>
-      </div>
-    </div>
-  );
 
   const renderLessons = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <BookOpen className="mx-auto mb-4 text-indigo-400" size={64} />
-        <h2 className="text-2xl font-bold text-white mb-2">Financial Education Center</h2>
-        <p className="text-indigo-200">Master essential banking and financial management skills</p>
+        <BookOpen className="mx-auto mb-4 text-blue-400" size={64} />
+        <h2 className="text-2xl font-bold text-white mb-2">Banking & Finance Academy</h2>
+        <p className="text-blue-200">Master essential banking and financial management skills</p>
       </div>
 
-      {selectedLesson ? (
-        <div className="bg-white/10 rounded-xl p-8 border border-white/20">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-white font-bold text-2xl">{selectedLesson.title}</h3>
-              <div className="flex items-center space-x-3 mt-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  selectedLesson.difficulty === 'beginner' ? 'bg-green-500/30 text-green-200' :
-                  selectedLesson.difficulty === 'intermediate' ? 'bg-yellow-500/30 text-yellow-200' :
-                  'bg-red-500/30 text-red-200'
-                }`}>
-                  {selectedLesson.difficulty.toUpperCase()}
-                </span>
-                <span className="text-yellow-400 font-semibold">+{selectedLesson.reward} coins</span>
-              </div>
-            </div>
-            <button
-              onClick={() => setSelectedLesson(null)}
-              className="text-purple-300 hover:text-white"
-            >
-              <ArrowLeft size={24} />
-            </button>
-          </div>
-
-          <div className="space-y-6">
-            <div className="bg-white/5 rounded-lg p-4">
-              <p className="text-purple-200 leading-relaxed">{selectedLesson.content}</p>
-            </div>
-
-            <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4">
-              <h4 className="text-blue-300 font-semibold mb-3">📚 Key Learning Points:</h4>
-              <ul className="text-blue-200 space-y-2">
-                {selectedLesson.keyPoints.map((point, index) => (
-                  <li key={index} className="flex items-start space-x-2">
-                    <CheckCircle className="text-blue-400 mt-0.5 flex-shrink-0" size={16} />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
-              <h4 className="text-green-300 font-semibold mb-3">🎯 Practical Exercise:</h4>
-              <p className="text-green-200">{selectedLesson.practicalExercise}</p>
-            </div>
-
-            <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4">
-              <h4 className="text-yellow-300 font-semibold mb-3">📊 Real-World Example:</h4>
-              <p className="text-yellow-200">{selectedLesson.realWorldExample}</p>
-            </div>
-
-            <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
-              <h4 className="text-red-300 font-semibold mb-3">⚠️ Common Mistakes to Avoid:</h4>
-              <ul className="text-red-200 space-y-1">
-                {selectedLesson.commonMistakes.map((mistake, index) => (
-                  <li key={index}>• {mistake}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-purple-500/20 border border-purple-500/30 rounded-lg p-4">
-              <h4 className="text-purple-300 font-semibold mb-3">📋 Action Steps:</h4>
-              <ol className="text-purple-200 space-y-1">
-                {selectedLesson.actionSteps.map((step, index) => (
-                  <li key={index}>{index + 1}. {step}</li>
-                ))}
-              </ol>
-            </div>
-
-            <button
-              onClick={() => completeLesson(selectedLesson)}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-colors"
-            >
-              Complete Lesson (+{selectedLesson.reward} coins)
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {financialLessons.map(lesson => (
-            <button
-              key={lesson.id}
-              onClick={() => setSelectedLesson(lesson)}
-              className="text-left bg-white/10 rounded-xl p-6 border border-white/20 hover:border-white/40 transition-all transform hover:scale-105"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-2 rounded-lg ${
-                  lesson.category === 'budgeting' ? 'bg-blue-500/20' :
-                  lesson.category === 'saving' ? 'bg-green-500/20' :
-                  lesson.category === 'borrowing' ? 'bg-orange-500/20' :
-                  lesson.category === 'investing' ? 'bg-purple-500/20' :
-                  'bg-cyan-500/20'
-                }`}>
-                  {lesson.category === 'budgeting' ? <Calculator className="text-blue-400" size={20} /> :
-                   lesson.category === 'saving' ? <PiggyBank className="text-green-400" size={20} /> :
-                   lesson.category === 'borrowing' ? <CreditCard className="text-orange-400" size={20} /> :
-                   lesson.category === 'investing' ? <TrendingUp className="text-purple-400" size={20} /> :
-                   <Target className="text-cyan-400" size={20} />}
-                </div>
-                <span className="text-yellow-400 font-semibold text-sm">+{lesson.reward}</span>
-              </div>
-              
-              <h3 className="text-white font-semibold text-lg mb-2">{lesson.title}</h3>
-              <p className="text-purple-200 text-sm mb-3">{lesson.content.substring(0, 120)}...</p>
-              
-              <div className="flex items-center justify-between">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  lesson.difficulty === 'beginner' ? 'bg-green-500/30 text-green-200' :
-                  lesson.difficulty === 'intermediate' ? 'bg-yellow-500/30 text-yellow-200' :
-                  'bg-red-500/30 text-red-200'
-                }`}>
-                  {lesson.difficulty.toUpperCase()}
-                </span>
-                <span className="text-purple-300 text-xs capitalize">{lesson.category}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
-  const renderLoanScenarios = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <CreditCard className="mx-auto mb-4 text-orange-400" size={64} />
-        <h2 className="text-2xl font-bold text-white mb-2">Smart Loan Decisions</h2>
-        <p className="text-orange-200">Compare loan options and make optimal borrowing choices</p>
-      </div>
-
-      {selectedLoanScenario ? (
-        <div className="bg-white/10 rounded-xl p-8 border border-white/20">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-white font-bold text-2xl">{selectedLoanScenario.title}</h3>
-              <p className="text-purple-200 mt-2">{selectedLoanScenario.purpose}</p>
-              <p className="text-yellow-400 font-semibold">Loan Amount: {selectedLoanScenario.amount.toLocaleString()} VND</p>
-            </div>
-            <button
-              onClick={() => setSelectedLoanScenario(null)}
-              className="text-purple-300 hover:text-white"
-            >
-              <ArrowLeft size={24} />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {selectedLoanScenario.options.map((option, index) => (
-              <div key={index} className="bg-white/10 rounded-lg p-4 border border-white/20">
-                <h4 className="text-white font-semibold mb-3">{option.bank}</h4>
-                
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-purple-200">Interest Rate:</span>
-                    <span className="text-white">{option.interestRate}%</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-purple-200">Term:</span>
-                    <span className="text-white">{option.term} years</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-purple-200">Monthly Payment:</span>
-                    <span className="text-white">{option.monthlyPayment.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm font-semibold">
-                    <span className="text-purple-200">Total Cost:</span>
-                    <span className="text-yellow-400">{option.totalCost.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="bg-green-500/20 rounded p-2">
-                    <h5 className="text-green-300 font-medium text-sm mb-1">Pros:</h5>
-                    <ul className="text-green-200 text-xs space-y-1">
-                      {option.pros.map((pro, proIndex) => (
-                        <li key={proIndex}>• {pro}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <div className="bg-red-500/20 rounded p-2">
-                    <h5 className="text-red-300 font-medium text-sm mb-1">Cons:</h5>
-                    <ul className="text-red-200 text-xs space-y-1">
-                      {option.cons.map((con, conIndex) => (
-                        <li key={conIndex}>• {con}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => solveLoanScenario(selectedLoanScenario, index)}
-                  className={`w-full mt-4 py-2 rounded-lg font-semibold transition-colors ${
-                    index === selectedLoanScenario.bestChoice
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
-                >
-                  Choose This Option
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4">
-            <h4 className="text-blue-300 font-semibold mb-2">💡 Analysis Tip:</h4>
-            <p className="text-blue-200 text-sm">{selectedLoanScenario.explanation}</p>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {loanScenarios.map(scenario => (
-            <button
-              key={scenario.id}
-              onClick={() => setSelectedLoanScenario(scenario)}
-              className="text-left bg-white/10 rounded-xl p-6 border border-white/20 hover:border-white/40 transition-all transform hover:scale-105"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <CreditCard className="text-orange-400" size={24} />
-                <span className="text-yellow-400 font-semibold">+{scenario.reward} coins</span>
-              </div>
-              
-              <h3 className="text-white font-semibold text-lg mb-2">{scenario.title}</h3>
-              <p className="text-purple-200 text-sm mb-3">{scenario.purpose}</p>
-              <div className="text-yellow-400 font-semibold">
-                Amount: {scenario.amount.toLocaleString()} VND
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
-  const renderBankProducts = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <Building2 className="mx-auto mb-4 text-blue-400" size={64} />
-        <h2 className="text-2xl font-bold text-white mb-2">Banking Products Comparison</h2>
-        <p className="text-blue-200">Compare and choose the best banking products for your needs</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {bankProducts.map(product => (
-          <div key={product.id} className="bg-white/10 rounded-xl p-6 border border-white/20">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {bankingLessons.map(lesson => (
+          <div key={lesson.id} className="bg-white/10 rounded-xl p-6 border border-white/20">
             <div className="flex items-center justify-between mb-4">
-              <div className={`p-2 rounded-lg ${
-                product.type === 'savings' ? 'bg-green-500/20' :
-                product.type === 'checking' ? 'bg-blue-500/20' :
-                product.type === 'credit' ? 'bg-purple-500/20' :
-                product.type === 'loan' ? 'bg-orange-500/20' :
-                'bg-cyan-500/20'
-              }`}>
-                {product.type === 'savings' ? <PiggyBank className="text-green-400" size={20} /> :
-                 product.type === 'checking' ? <Building2 className="text-blue-400" size={20} /> :
-                 product.type === 'credit' ? <CreditCard className="text-purple-400" size={20} /> :
-                 product.type === 'loan' ? <DollarSign className="text-orange-400" size={20} /> :
-                 <TrendingUp className="text-cyan-400" size={20} />}
+              <div>
+                <h3 className="text-white font-bold text-lg">{lesson.title}</h3>
+                <div className="flex items-center space-x-3 mt-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    lesson.difficulty === 'beginner' ? 'bg-green-500/30 text-green-200' :
+                    lesson.difficulty === 'intermediate' ? 'bg-yellow-500/30 text-yellow-200' :
+                    'bg-red-500/30 text-red-200'
+                  }`}>
+                    {lesson.difficulty.toUpperCase()}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    lesson.category === 'basics' ? 'bg-blue-500/30 text-blue-200' :
+                    lesson.category === 'advanced' ? 'bg-purple-500/30 text-purple-200' :
+                    lesson.category === 'products' ? 'bg-cyan-500/30 text-cyan-200' :
+                    'bg-orange-500/30 text-orange-200'
+                  }`}>
+                    {lesson.category.toUpperCase()}
+                  </span>
+                  <div className="flex items-center space-x-1 text-purple-300">
+                    <Clock size={12} />
+                    <span className="text-xs">{lesson.estimatedTime}</span>
+                  </div>
+                </div>
               </div>
-              {product.recommended && (
-                <span className="bg-green-500/30 text-green-200 px-2 py-1 rounded text-xs font-medium">
-                  RECOMMENDED
-                </span>
-              )}
+              <div className="text-right">
+                <div className="text-yellow-400 font-bold">+{lesson.reward}</div>
+                <div className="text-yellow-200 text-sm">coins</div>
+              </div>
             </div>
-
-            <h3 className="text-white font-semibold text-lg mb-2">{product.name}</h3>
             
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between text-sm">
-                <span className="text-purple-200">Interest Rate:</span>
-                <span className="text-white">{product.interestRate}%</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-purple-200">Annual Fee:</span>
-                <span className="text-white">{product.fees.toLocaleString()} VND</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-purple-200">Risk Level:</span>
-                <span className={`${
-                  product.riskLevel === 'low' ? 'text-green-400' :
-                  product.riskLevel === 'medium' ? 'text-yellow-400' :
-                  'text-red-400'
-                }`}>
-                  {product.riskLevel.toUpperCase()}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="bg-green-500/20 rounded p-2">
-                <h4 className="text-green-300 font-medium text-sm mb-1">Benefits:</h4>
-                <ul className="text-green-200 text-xs space-y-1">
-                  {product.benefits.map((benefit, index) => (
-                    <li key={index}>• {benefit}</li>
+            <p className="text-purple-200 mb-4">{lesson.content}</p>
+            
+            <div className="space-y-4">
+              <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-3">
+                <h4 className="text-blue-300 font-medium text-sm mb-2">📚 Key Concepts:</h4>
+                <ul className="text-blue-200 text-xs space-y-1">
+                  {lesson.keyPoints.map((point, index) => (
+                    <li key={index}>• {point}</li>
                   ))}
                 </ul>
               </div>
-              
-              <div className="bg-blue-500/20 rounded p-2">
-                <h4 className="text-blue-300 font-medium text-sm mb-1">Requirements:</h4>
-                <ul className="text-blue-200 text-xs space-y-1">
-                  {product.requirements.map((req, index) => (
-                    <li key={index}>• {req}</li>
+
+              <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-3">
+                <h4 className="text-green-300 font-medium text-sm mb-2">💡 Practical Tips:</h4>
+                <ul className="text-green-200 text-xs space-y-1">
+                  {lesson.practicalTips.map((tip, index) => (
+                    <li key={index}>• {tip}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-3">
+                <h4 className="text-yellow-300 font-medium text-sm mb-2">📊 Real Examples:</h4>
+                <ul className="text-yellow-200 text-xs space-y-1">
+                  {lesson.realExamples.map((example, index) => (
+                    <li key={index}>• {example}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3">
+                <h4 className="text-red-300 font-medium text-sm mb-2">⚠️ Common Mistakes:</h4>
+                <ul className="text-red-200 text-xs space-y-1">
+                  {lesson.commonMistakes.map((mistake, index) => (
+                    <li key={index}>• {mistake}</li>
                   ))}
                 </ul>
               </div>
             </div>
 
             <button
-              onClick={() => {
-                addCoins(50);
-                updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 5 });
-              }}
-              className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-colors"
+              onClick={() => completeLesson(lesson.id)}
+              disabled={lesson.completed}
+              className={`w-full mt-4 py-3 rounded-lg font-semibold transition-colors ${
+                lesson.completed
+                  ? 'bg-green-500/30 text-green-200 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700'
+              }`}
             >
-              Learn More (+50 coins)
+              {lesson.completed ? 'Completed ✓' : `Complete Lesson (+${lesson.reward} coins)`}
             </button>
           </div>
         ))}
@@ -1172,157 +517,355 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
     </div>
   );
 
-  const renderCalculator = () => (
+  const renderBudgeting = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <Calculator className="mx-auto mb-4 text-cyan-400" size={64} />
-        <h2 className="text-2xl font-bold text-white mb-2">Financial Calculators</h2>
-        <p className="text-cyan-200">Interactive tools to plan your financial future</p>
+        <Calculator className="mx-auto mb-4 text-green-400" size={64} />
+        <h2 className="text-2xl font-bold text-white mb-2">Smart Budgeting System</h2>
+        <p className="text-green-200">Master the 50/30/20 rule and optimize your spending</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Savings Growth Calculator */}
-        <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-          <h3 className="text-white font-semibold mb-4">Savings Growth Calculator</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-purple-200 text-sm mb-1">Monthly Savings (VND):</label>
-              <input
-                type="number"
-                defaultValue="2000000"
-                className="w-full bg-white/20 text-white px-3 py-2 rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-purple-200 text-sm mb-1">Annual Interest Rate (%):</label>
-              <input
-                type="number"
-                defaultValue="6"
-                step="0.1"
-                className="w-full bg-white/20 text-white px-3 py-2 rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-purple-200 text-sm mb-1">Time Period (years):</label>
-              <input
-                type="number"
-                defaultValue="10"
-                className="w-full bg-white/20 text-white px-3 py-2 rounded"
-              />
-            </div>
-            
-            <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
-              <h4 className="text-green-300 font-semibold mb-2">Projected Results:</h4>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-green-200">Total Invested:</span>
-                  <span className="text-white">240,000,000 VND</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-green-200">Interest Earned:</span>
-                  <span className="text-green-400">87,500,000 VND</span>
-                </div>
-                <div className="flex justify-between font-semibold">
-                  <span className="text-green-200">Final Amount:</span>
-                  <span className="text-green-400">327,500,000 VND</span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                addCoins(75);
-                updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 10 });
-              }}
-              className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-green-700 hover:to-blue-700 transition-colors"
-            >
-              Calculate Savings (+75 coins)
-            </button>
+      {/* Budget Overview */}
+      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-white font-semibold text-xl">Monthly Budget Analysis</h3>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-green-400">{budget.income.toLocaleString()} VND</div>
+            <div className="text-green-200 text-sm">Monthly Income</div>
           </div>
         </div>
 
-        {/* Loan Payment Calculator */}
-        <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-          <h3 className="text-white font-semibold mb-4">Loan Payment Calculator</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-purple-200 text-sm mb-1">Loan Amount (VND):</label>
-              <input
-                type="number"
-                defaultValue="500000000"
-                className="w-full bg-white/20 text-white px-3 py-2 rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-purple-200 text-sm mb-1">Interest Rate (%):</label>
-              <input
-                type="number"
-                defaultValue="8.5"
-                step="0.1"
-                className="w-full bg-white/20 text-white px-3 py-2 rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-purple-200 text-sm mb-1">Loan Term (years):</label>
-              <input
-                type="number"
-                defaultValue="5"
-                className="w-full bg-white/20 text-white px-3 py-2 rounded"
-              />
-            </div>
-            
-            <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-4">
-              <h4 className="text-orange-300 font-semibold mb-2">Loan Details:</h4>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-orange-200">Monthly Payment:</span>
-                  <span className="text-white">10,200,000 VND</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {budget.categories.map((category, index) => (
+            <div key={index} className="bg-white/5 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-white font-medium">{category.name}</h4>
+                <div className={`w-4 h-4 rounded-full ${category.color}`}></div>
+              </div>
+              
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-purple-200">Allocated:</span>
+                  <span className="text-white">{category.allocated.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-orange-200">Total Interest:</span>
-                  <span className="text-orange-400">112,000,000 VND</span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-purple-200">Spent:</span>
+                  <span className={category.spent > category.allocated ? 'text-red-400' : 'text-white'}>
+                    {category.spent.toLocaleString()}
+                  </span>
                 </div>
-                <div className="flex justify-between font-semibold">
-                  <span className="text-orange-200">Total Paid:</span>
-                  <span className="text-orange-400">612,000,000 VND</span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-purple-200">Remaining:</span>
+                  <span className={category.remaining < 0 ? 'text-red-400' : 'text-green-400'}>
+                    {category.remaining.toLocaleString()}
+                  </span>
                 </div>
               </div>
-            </div>
 
-            <button
-              onClick={() => {
-                addCoins(75);
-                updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 10 });
-              }}
-              className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-lg font-semibold hover:from-orange-700 hover:to-red-700 transition-colors"
-            >
-              Calculate Loan (+75 coins)
-            </button>
+              <div className="w-full bg-gray-700/30 rounded-full h-2 mb-3">
+                <div 
+                  className={`h-2 rounded-full transition-all duration-500 ${
+                    category.spent > category.allocated ? 'bg-red-400' : category.color
+                  }`}
+                  style={{ width: `${Math.min((category.spent / category.allocated) * 100, 100)}%` }}
+                />
+              </div>
+
+              <div className="bg-white/5 rounded p-2">
+                <h5 className="text-white text-xs font-medium mb-1">💡 Tips:</h5>
+                <ul className="text-purple-200 text-xs space-y-1">
+                  {category.tips.map((tip, tipIndex) => (
+                    <li key={tipIndex}>• {tip}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 bg-blue-500/20 border border-blue-500/30 rounded-lg p-4">
+          <h4 className="text-blue-300 font-semibold mb-3">📊 Budget Health Analysis:</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-white">
+                {Math.round((budget.categories.reduce((sum, cat) => sum + cat.spent, 0) / budget.income) * 100)}%
+              </div>
+              <div className="text-blue-200 text-sm">Income Utilized</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">
+                {budget.categories.filter(cat => cat.remaining >= 0).length}
+              </div>
+              <div className="text-green-200 text-sm">Categories On Track</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-400">
+                {Math.round((budget.categories.find(cat => cat.name === 'Savings')?.spent || 0) / budget.income * 100)}%
+              </div>
+              <div className="text-purple-200 text-sm">Savings Rate</div>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Budget Optimization Tips */}
+      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+        <h3 className="text-white font-semibold text-xl mb-4">Budget Optimization Strategies</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h4 className="text-green-300 font-medium">✅ What You're Doing Well:</h4>
+            <ul className="text-green-200 text-sm space-y-2">
+              <li>• Maintaining emergency fund allocation</li>
+              <li>• Keeping housing costs reasonable (32% of income)</li>
+              <li>• Saving 16% of income (above recommended 20%)</li>
+            </ul>
+          </div>
+          <div className="space-y-4">
+            <h4 className="text-red-300 font-medium">⚠️ Areas for Improvement:</h4>
+            <ul className="text-red-200 text-sm space-y-2">
+              <li>• Entertainment spending is 25% over budget</li>
+              <li>• Consider reducing dining out expenses</li>
+              <li>• Look for ways to increase income streams</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCashFlow = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <BarChart3 className="mx-auto mb-4 text-purple-400" size={64} />
+        <h2 className="text-2xl font-bold text-white mb-2">Cash Flow Management</h2>
+        <p className="text-purple-200">Understand and optimize your money flow</p>
       </div>
 
       <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-        <h3 className="text-white font-semibold mb-4">Smart Borrowing Tips</h3>
+        <h3 className="text-white font-semibold text-xl mb-6">Interactive Cash Flow Calculator</h3>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-3">
-            <h4 className="text-green-300 font-medium">✅ Good Debt Examples:</h4>
-            <ul className="text-green-200 text-sm space-y-1">
-              <li>• Mortgage for primary residence</li>
-              <li>• Student loans for education</li>
-              <li>• Business loans for income generation</li>
-              <li>• Car loans for necessary transportation</li>
-            </ul>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-white font-medium mb-2">Monthly Income (VND)</label>
+              <input
+                type="number"
+                value={cashFlowData.monthlyIncome}
+                onChange={(e) => setCashFlowData(prev => ({ ...prev, monthlyIncome: Number(e.target.value) }))}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:border-blue-400 focus:outline-none"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-white font-medium mb-2">Fixed Expenses (VND)</label>
+              <input
+                type="number"
+                value={cashFlowData.fixedExpenses}
+                onChange={(e) => setCashFlowData(prev => ({ ...prev, fixedExpenses: Number(e.target.value) }))}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:border-blue-400 focus:outline-none"
+              />
+              <p className="text-purple-300 text-sm mt-1">Rent, utilities, insurance, loan payments</p>
+            </div>
+            
+            <div>
+              <label className="block text-white font-medium mb-2">Variable Expenses (VND)</label>
+              <input
+                type="number"
+                value={cashFlowData.variableExpenses}
+                onChange={(e) => setCashFlowData(prev => ({ ...prev, variableExpenses: Number(e.target.value) }))}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:border-blue-400 focus:outline-none"
+              />
+              <p className="text-purple-300 text-sm mt-1">Food, entertainment, shopping, transport</p>
+            </div>
           </div>
-          <div className="space-y-3">
-            <h4 className="text-red-300 font-medium">❌ Bad Debt Examples:</h4>
-            <ul className="text-red-200 text-sm space-y-1">
-              <li>• Credit card debt for luxury purchases</li>
-              <li>• Personal loans for vacations</li>
-              <li>• Payday loans with extreme interest rates</li>
-              <li>• Loans for depreciating assets</li>
-            </ul>
+
+          <div className="space-y-4">
+            <div className="bg-white/5 rounded-lg p-4">
+              <h4 className="text-white font-semibold mb-3">Cash Flow Summary</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-purple-200">Total Income:</span>
+                  <span className="text-green-400 font-semibold">{cashFlowData.monthlyIncome.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-purple-200">Total Expenses:</span>
+                  <span className="text-red-400 font-semibold">
+                    {(cashFlowData.fixedExpenses + cashFlowData.variableExpenses).toLocaleString()}
+                  </span>
+                </div>
+                <div className="border-t border-white/20 pt-2">
+                  <div className="flex justify-between">
+                    <span className="text-purple-200 font-semibold">Net Cash Flow:</span>
+                    <span className={`font-bold ${cashFlowData.netCashFlow >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {cashFlowData.netCashFlow.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={`rounded-lg p-4 border ${
+              cashFlowData.netCashFlow >= 0 
+                ? 'bg-green-500/20 border-green-500/30' 
+                : 'bg-red-500/20 border-red-500/30'
+            }`}>
+              <h4 className={`font-semibold mb-2 ${
+                cashFlowData.netCashFlow >= 0 ? 'text-green-300' : 'text-red-300'
+              }`}>
+                {cashFlowData.netCashFlow >= 0 ? '✅ Healthy Cash Flow' : '⚠️ Negative Cash Flow'}
+              </h4>
+              <p className={`text-sm ${
+                cashFlowData.netCashFlow >= 0 ? 'text-green-200' : 'text-red-200'
+              }`}>
+                {cashFlowData.netCashFlow >= 0 
+                  ? 'You have surplus money for savings and investments. Consider increasing your savings rate or exploring investment opportunities.'
+                  : 'You\'re spending more than you earn. Review your expenses and look for areas to cut back or ways to increase income.'
+                }
+              </p>
+            </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderLoanProducts = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <CreditCard className="mx-auto mb-4 text-orange-400" size={64} />
+        <h2 className="text-2xl font-bold text-white mb-2">Loan Products & Credit Cards</h2>
+        <p className="text-orange-200">Compare and understand different financial products</p>
+      </div>
+
+      {/* Loan Products */}
+      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+        <h3 className="text-white font-semibold text-xl mb-6">Available Loan Products</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {loanProducts.map(loan => (
+            <div key={loan.id} className="bg-white/5 rounded-lg p-6 border border-white/10">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-white font-bold text-lg">{loan.name}</h4>
+                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  loan.type === 'personal' ? 'bg-red-500/30 text-red-200' :
+                  loan.type === 'mortgage' ? 'bg-green-500/30 text-green-200' :
+                  loan.type === 'auto' ? 'bg-blue-500/30 text-blue-200' :
+                  loan.type === 'business' ? 'bg-purple-500/30 text-purple-200' :
+                  'bg-yellow-500/30 text-yellow-200'
+                }`}>
+                  {loan.type.toUpperCase()}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <span className="text-purple-200 text-sm">Interest Rate:</span>
+                  <div className="text-white font-semibold">{loan.interestRate}% APR</div>
+                </div>
+                <div>
+                  <span className="text-purple-200 text-sm">Max Amount:</span>
+                  <div className="text-white font-semibold">{(loan.maxAmount / 1000000).toFixed(0)}M VND</div>
+                </div>
+                <div>
+                  <span className="text-purple-200 text-sm">Term:</span>
+                  <div className="text-white font-semibold">{loan.term}</div>
+                </div>
+                <div>
+                  <span className="text-purple-200 text-sm">Best For:</span>
+                  <div className="text-white font-semibold text-xs">{loan.bestFor}</div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="bg-blue-500/20 border border-blue-500/30 rounded p-3">
+                  <h5 className="text-blue-300 font-medium text-sm mb-1">Requirements:</h5>
+                  <ul className="text-blue-200 text-xs space-y-1">
+                    {loan.requirements.map((req, index) => (
+                      <li key={index}>• {req}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-green-500/20 border border-green-500/30 rounded p-2">
+                    <h5 className="text-green-300 font-medium text-xs mb-1">Pros:</h5>
+                    <ul className="text-green-200 text-xs space-y-1">
+                      {loan.pros.map((pro, index) => (
+                        <li key={index}>• {pro}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-red-500/20 border border-red-500/30 rounded p-2">
+                    <h5 className="text-red-300 font-medium text-xs mb-1">Cons:</h5>
+                    <ul className="text-red-200 text-xs space-y-1">
+                      {loan.cons.map((con, index) => (
+                        <li key={index}>• {con}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-500/20 border border-yellow-500/30 rounded p-3">
+                  <h5 className="text-yellow-300 font-medium text-sm mb-1">Real Example:</h5>
+                  <p className="text-yellow-200 text-xs">{loan.realExample}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Credit Cards */}
+      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+        <h3 className="text-white font-semibold text-xl mb-6">Credit Card Comparison</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {creditCards.map(card => (
+            <div key={card.id} className="bg-white/5 rounded-lg p-6 border border-white/10">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-white font-bold">{card.name}</h4>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  card.type === 'basic' ? 'bg-gray-500/30 text-gray-200' :
+                  card.type === 'rewards' ? 'bg-green-500/30 text-green-200' :
+                  card.type === 'premium' ? 'bg-purple-500/30 text-purple-200' :
+                  'bg-blue-500/30 text-blue-200'
+                }`}>
+                  {card.type.toUpperCase()}
+                </span>
+              </div>
+
+              <div className="space-y-3 mb-4">
+                <div className="flex justify-between">
+                  <span className="text-purple-200 text-sm">APR:</span>
+                  <span className="text-white font-semibold">{card.apr}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-purple-200 text-sm">Annual Fee:</span>
+                  <span className="text-white font-semibold">
+                    {card.annualFee === 0 ? 'Free' : `${card.annualFee.toLocaleString()} VND`}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-purple-200 text-sm">Rewards:</span>
+                  <div className="text-white text-sm">{card.rewards}</div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="bg-blue-500/20 border border-blue-500/30 rounded p-2">
+                  <h5 className="text-blue-300 font-medium text-xs mb-1">Benefits:</h5>
+                  <ul className="text-blue-200 text-xs space-y-1">
+                    {card.benefits.slice(0, 3).map((benefit, index) => (
+                      <li key={index}>• {benefit}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-green-500/20 border border-green-500/30 rounded p-2">
+                  <h5 className="text-green-300 font-medium text-xs mb-1">Best For:</h5>
+                  <p className="text-green-200 text-xs">{card.bestFor}</p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -1336,16 +879,12 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
         <p className="text-blue-200">Master banking, budgeting, and financial management</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { id: 'budgeting', name: 'Budget Master', icon: Calculator, color: 'from-blue-500 to-cyan-500', description: 'Learn 50/30/20 rule and expense tracking' },
-          { id: 'savings', name: 'Savings Simulator', icon: PiggyBank, color: 'from-green-500 to-emerald-500', description: 'Build emergency funds and savings habits' },
-          { id: 'loans', name: 'Loan Advisor', icon: CreditCard, color: 'from-orange-500 to-red-500', description: 'Compare loans and make smart borrowing decisions' },
-          { id: 'products', name: 'Banking Products', icon: Building2, color: 'from-purple-500 to-pink-500', description: 'Explore savings, checking, and credit options' },
-          { id: 'lessons', name: 'Financial Academy', icon: BookOpen, color: 'from-indigo-500 to-purple-500', description: 'Comprehensive financial education' },
-          { id: 'calculator', name: 'Financial Tools', icon: Calculator, color: 'from-cyan-500 to-blue-500', description: 'Interactive calculators and planning tools' },
-          { id: 'cashflow', name: 'Cash Flow Manager', icon: Activity, color: 'from-teal-500 to-green-500', description: 'Track income and expenses in real-time' },
-          { id: 'wheel', name: 'Banking Rewards', icon: Gift, color: 'from-yellow-500 to-orange-500', description: 'Spin for banking bonuses and rewards' }
+          { id: 'lessons', name: 'Banking Academy', icon: BookOpen, color: 'from-blue-500 to-cyan-500', description: 'Learn essential banking concepts' },
+          { id: 'budgeting', name: 'Smart Budgeting', icon: Calculator, color: 'from-green-500 to-emerald-500', description: 'Master the 50/30/20 rule' },
+          { id: 'cashflow', name: 'Cash Flow Manager', icon: BarChart3, color: 'from-purple-500 to-pink-500', description: 'Optimize money flow' },
+          { id: 'products', name: 'Financial Products', icon: CreditCard, color: 'from-orange-500 to-red-500', description: 'Compare loans and cards' }
         ].map(game => (
           <button
             key={game.id}
@@ -1363,25 +902,23 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
       </div>
 
       <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-        <h2 className="text-xl font-bold text-white mb-4">Your Banking Progress</h2>
+        <h2 className="text-xl font-bold text-white mb-4">Banking Skills Progress</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-400">{progress.financialLiteracyScore}</div>
             <p className="text-blue-200 text-sm">Financial Knowledge</p>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-400">{progress.coins}</div>
-            <p className="text-green-200 text-sm">Total Coins</p>
+            <div className="text-2xl font-bold text-green-400">{bankingLessons.filter(l => l.completed).length}</div>
+            <p className="text-green-200 text-sm">Lessons Completed</p>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-400">{progress.level}</div>
             <p className="text-purple-200 text-sm">Banking Level</p>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-400">
-              {financialLessons.filter(l => l.completed).length}/{financialLessons.length}
-            </div>
-            <p className="text-yellow-200 text-sm">Lessons Completed</p>
+            <div className="text-2xl font-bold text-yellow-400">{progress.coins}</div>
+            <p className="text-yellow-200 text-sm">Available Coins</p>
           </div>
         </div>
       </div>
@@ -1390,35 +927,14 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
 
   const renderContent = () => {
     switch (activeGame) {
-      case 'budgeting':
-        return renderBudgetingGame();
-      case 'cashflow':
-        return renderCashFlowGame();
       case 'lessons':
         return renderLessons();
-      case 'loans':
-        return renderLoanScenarios();
+      case 'budgeting':
+        return renderBudgeting();
+      case 'cashflow':
+        return renderCashFlow();
       case 'products':
-        return renderBankProducts();
-      case 'calculator':
-        return renderCalculator();
-      case 'wheel':
-        return (
-          <div className="text-center py-12">
-            <Gift className="mx-auto mb-4 text-yellow-400" size={64} />
-            <h2 className="text-2xl font-bold text-white mb-2">Banking Reward Wheel</h2>
-            <p className="text-yellow-200 mb-6">Spin for exclusive banking bonuses and financial tools!</p>
-            <button
-              onClick={() => {
-                addCoins(Math.floor(Math.random() * 200) + 50);
-                updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 5 });
-              }}
-              className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-yellow-600 hover:to-orange-600 transition-colors"
-            >
-              Spin Banking Wheel (100 coins)
-            </button>
-          </div>
-        );
+        return renderLoanProducts();
       default:
         return renderOverview();
     }

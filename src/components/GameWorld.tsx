@@ -29,7 +29,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       icon: Building2,
       color: 'from-blue-500 to-cyan-500',
       description: 'Master banking, loans, budgeting, and financial management',
-      unlocked: true,
+      unlocked: true, // Always accessible
       level: 3,
       position: { x: 20, y: 30 },
       activities: ['Savings Simulator', 'Loan Calculator', 'Budget Planner', 'Cash Flow Manager']
@@ -40,7 +40,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       icon: Shield,
       color: 'from-red-500 to-orange-500',
       description: 'Learn cybersecurity and scam detection skills',
-      unlocked: true,
+      unlocked: true, // Always accessible
       level: 2,
       position: { x: 70, y: 20 },
       activities: ['Phishing Detector', 'Ransomware Defense', 'Social Engineering Quiz', 'FOMO Resistance']
@@ -51,7 +51,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       icon: ShoppingCart,
       color: 'from-green-500 to-emerald-500',
       description: 'Smart shopping and budget management',
-      unlocked: true,
+      unlocked: true, // Always accessible
       level: 4,
       position: { x: 20, y: 70 },
       activities: ['Bargain Hunter', 'Price Comparison', 'Scam Detector', 'Budget Challenge']
@@ -62,7 +62,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       icon: TrendingUp,
       color: 'from-purple-500 to-pink-500',
       description: 'Trading, investing, and portfolio management',
-      unlocked: true,
+      unlocked: true, // Always accessible
       level: 1,
       position: { x: 70, y: 70 },
       activities: ['Stock Simulator', 'Portfolio Builder', 'Risk Assessment', 'Market Analysis']
@@ -71,13 +71,13 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
 
   const cityBuildings = [
     { name: 'Player House', unlocked: true, level: progress.level, position: { x: 45, y: 50 } },
-    { name: 'Community Center', unlocked: progress.level >= 2, level: 2, position: { x: 50, y: 40 } },
-    { name: 'Financial Academy', unlocked: progress.level >= 3, level: 3, position: { x: 40, y: 45 } },
-    { name: 'Security Tower', unlocked: progress.milSkillScore >= 50, level: 2, position: { x: 60, y: 30 } },
-    { name: 'Trading Floor', unlocked: progress.financialLiteracyScore >= 60, level: 1, position: { x: 55, y: 60 } },
-    { name: 'Shopping Mall', unlocked: progress.coins >= 500, level: 4, position: { x: 30, y: 60 } },
-    { name: 'Bank Headquarters', unlocked: progress.level >= 5, level: 0, position: { x: 25, y: 35 } },
-    { name: 'Cyber Defense Center', unlocked: progress.milSkillScore >= 80, level: 0, position: { x: 65, y: 25 } }
+    { name: 'Community Center', unlocked: true, level: 2, position: { x: 50, y: 40 } },
+    { name: 'Financial Academy', unlocked: true, level: 3, position: { x: 40, y: 45 } },
+    { name: 'Security Tower', unlocked: true, level: 2, position: { x: 60, y: 30 } },
+    { name: 'Trading Floor', unlocked: true, level: 1, position: { x: 55, y: 60 } },
+    { name: 'Shopping Mall', unlocked: true, level: 4, position: { x: 30, y: 60 } },
+    { name: 'Bank Headquarters', unlocked: true, level: 5, position: { x: 25, y: 35 } },
+    { name: 'Cyber Defense Center', unlocked: true, level: 3, position: { x: 65, y: 25 } }
   ];
 
   const completeMission = (missionId: string) => {
