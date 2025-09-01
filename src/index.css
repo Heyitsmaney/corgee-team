@@ -1,3 +1,80 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(168, 85, 247, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.8); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Candlestick Chart Styles */
+.candlestick-green {
+  background: linear-gradient(to top, #10b981, #34d399);
+}
+
+.candlestick-red {
+  background: linear-gradient(to top, #ef4444, #f87171);
+}
+
+/* Trading Interface Enhancements */
+.trading-card {
+  transition: all 0.3s ease;
+}
+
+.trading-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Wheel Animation */
+@keyframes wheelSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(1440deg); }
+}
+
+.wheel-spinning {
+  animation: wheelSpin 3s cubic-bezier(0.23, 1, 0.32, 1);
+}

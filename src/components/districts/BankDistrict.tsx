@@ -525,6 +525,35 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
         <p className="text-green-200">Master the 50/30/20 rule and optimize your spending</p>
       </div>
 
+      {/* Interactive Budget Game */}
+      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+        <h3 className="text-white font-semibold text-xl mb-4">🎮 Budget Challenge Game</h3>
+        <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg p-4 mb-4">
+          <p className="text-white mb-3">
+            <strong>Scenario:</strong> You just got your first job earning 25M VND/month. 
+            Allocate your budget wisely to maximize your financial health score!
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <div className="bg-white/10 rounded p-2 text-center">
+              <div className="text-blue-400 font-bold">Housing</div>
+              <div className="text-white">Recommended: 30%</div>
+            </div>
+            <div className="bg-white/10 rounded p-2 text-center">
+              <div className="text-green-400 font-bold">Food</div>
+              <div className="text-white">Recommended: 15%</div>
+            </div>
+            <div className="bg-white/10 rounded p-2 text-center">
+              <div className="text-yellow-400 font-bold">Transport</div>
+              <div className="text-white">Recommended: 10%</div>
+            </div>
+            <div className="bg-white/10 rounded p-2 text-center">
+              <div className="text-purple-400 font-bold">Savings</div>
+              <div className="text-white">Recommended: 20%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Budget Overview */}
       <div className="bg-white/10 rounded-xl p-6 border border-white/20">
         <div className="flex items-center justify-between mb-6">
@@ -537,10 +566,10 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {budget.categories.map((category, index) => (
-            <div key={index} className="bg-white/5 rounded-lg p-4">
+            <div key={index} className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all duration-300 hover:scale-105 group">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-white font-medium">{category.name}</h4>
-                <div className={`w-4 h-4 rounded-full ${category.color}`}></div>
+                <div className={`w-4 h-4 rounded-full ${category.color} group-hover:animate-pulse`}></div>
               </div>
               
               <div className="space-y-2 mb-4">
@@ -564,20 +593,56 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
 
               <div className="w-full bg-gray-700/30 rounded-full h-2 mb-3">
                 <div 
-                  className={`h-2 rounded-full transition-all duration-500 ${
+                  className={`h-2 rounded-full transition-all duration-700 ${
                     category.spent > category.allocated ? 'bg-red-400' : category.color
                   }`}
                   style={{ width: `${Math.min((category.spent / category.allocated) * 100, 100)}%` }}
                 />
               </div>
 
-              <div className="bg-white/5 rounded p-2">
+              <div className="bg-white/5 rounded p-2 group-hover:bg-white/10 transition-colors">
                 <h5 className="text-white text-xs font-medium mb-1">💡 Tips:</h5>
                 <ul className="text-purple-200 text-xs space-y-1">
                   {category.tips.map((tip, tipIndex) => (
                     <li key={tipIndex}>• {tip}</li>
                   ))}
                 </ul>
+              </div>
+
+              {/* Interactive Budget Adjustment */}
+              <div className="mt-3 space-y-2">
+                <button
+                  onClick={() => {
+                    setBudget(prev => ({
+                      ...prev,
+                      categories: prev.categories.map(cat =>
+                        cat.name === category.name
+                          ? { ...cat, allocated: cat.allocated + 500000, remaining: cat.remaining + 500000 }
+                          : cat
+                      )
+                    }));
+                    addCoins(10);
+                  }}
+                  className="w-full bg-green-600/30 hover:bg-green-600/50 text-green-200 py-1 rounded text-xs transition-colors"
+                >
+                  Increase Budget (+10 coins)
+                </button>
+                <button
+                  onClick={() => {
+                    setBudget(prev => ({
+                      ...prev,
+                      categories: prev.categories.map(cat =>
+                        cat.name === category.name
+                          ? { ...cat, allocated: Math.max(0, cat.allocated - 500000), remaining: cat.remaining - 500000 }
+                          : cat
+                      )
+                    }));
+                    addCoins(15);
+                  }}
+                  className="w-full bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 py-1 rounded text-xs transition-colors"
+                >
+                  Optimize Spending (+15 coins)
+                </button>
               </div>
             </div>
           ))}
