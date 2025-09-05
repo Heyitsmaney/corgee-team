@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Building2, ShoppingCart, TrendingUp, Shield, Gift, Map, Coins, Trophy, Star, Bell, AlertTriangle, X, CheckCircle, Eye, Brain, Zap, Target, Award, Clock, Users, MessageCircle, Play, Pause, Volume2, VolumeX, Calendar } from 'lucide-react';
+import { ArrowLeft, Building2, ShoppingCart, TrendingUp, Shield, Gift, Map, Coins, Trophy, Star, Bell, AlertTriangle, X, CheckCircle, Eye, Brain, Zap, Target, Award, Clock, Users, MessageCircle, Play, Pause, Volume2, VolumeX, Calendar, Smartphone, CreditCard, Heart, Flame, TrendingDown, DollarSign, Coffee, GameController2, Headphones, ShoppingBag, Wifi, Battery, Signal } from 'lucide-react';
 import { BankDistrict } from './districts/BankDistrict';
 import { ScamAlley } from './districts/ScamAlley';
 import { InvestmentPark } from './districts/InvestmentPark';
@@ -11,9 +11,40 @@ interface GameWorldProps {
   onNavigate: (screen: 'dashboard' | 'game' | 'challenge' | 'community' | 'settings') => void;
 }
 
+interface GenZScenario {
+  id: string;
+  type: 'shopping' | 'crypto' | 'bnpl' | 'social' | 'subscription' | 'gig_economy' | 'dating' | 'gaming';
+  title: string;
+  situation: string;
+  context: string;
+  timeLimit: number; // seconds
+  options: {
+    id: string;
+    text: string;
+    emoji: string;
+    consequence: string;
+    moneyImpact: number;
+    creditImpact: number;
+    stressLevel: number;
+    aiResponse: string;
+    isOptimal: boolean;
+  }[];
+  urgency: 'low' | 'medium' | 'high' | 'extreme';
+  platform: 'instagram' | 'tiktok' | 'snapchat' | 'discord' | 'whatsapp' | 'dating_app' | 'shopping_app' | 'crypto_app';
+  reward: number;
+  streakBonus: number;
+}
+
+interface AIFeedback {
+  personality: 'supportive' | 'savage' | 'wise' | 'hype';
+  message: string;
+  tips: string[];
+  memeReference?: string;
+}
+
 interface PopupCase {
   id: string;
-  type: 'scam_alert' | 'investment_tip' | 'budget_warning' | 'achievement' | 'daily_bonus' | 'market_news' | 'security_alert';
+  type: 'scam_alert' | 'investment_tip' | 'budget_warning' | 'achievement' | 'daily_bonus' | 'market_news' | 'security_alert' | 'gen_z_scenario' | 'fomo_alert' | 'impulse_buy' | 'crypto_hype' | 'bnpl_trap';
   title: string;
   message: string;
   options?: { id: string; text: string; reward?: number; consequence?: string }[];
@@ -22,6 +53,8 @@ interface PopupCase {
   autoClose?: number;
   icon: React.ComponentType<any>;
   color: string;
+  platform?: string;
+  timeLimit?: number;
 }
 
 interface CityMission {
@@ -53,6 +86,11 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
   const { progress, addCoins, updateProgress, addBadge } = useUser();
   const [currentDistrict, setCurrentDistrict] = useState<'overview' | 'bank' | 'scam' | 'investment' | 'market' | 'reward'>('overview');
   const [popupCase, setPopupCase] = useState<PopupCase | null>(null);
+  const [currentGenZScenario, setCurrentGenZScenario] = useState<GenZScenario | null>(null);
+  const [scenarioTimeLeft, setScenarioTimeLeft] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [dailyFailures, setDailyFailures] = useState(0);
+  const [aiPersonality, setAiPersonality] = useState<'supportive' | 'savage' | 'wise' | 'hype'>('hype');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeMissions, setActiveMissions] = useState<CityMission[]>([]);
@@ -70,238 +108,504 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
   const districts = [
     { 
       id: 'bank', 
-      name: 'Bank District', 
+      name: 'Money Moves HQ', 
       icon: Building2, 
       color: 'from-blue-500 to-cyan-500',
-      description: 'Master banking, budgeting & loans',
+      description: 'Level up your money game 💰',
       unlocked: true,
-      buildings: ['Central Bank', 'Credit Union', 'Investment Firm', 'Financial Academy'],
+      buildings: ['Digital Bank', 'Credit Builder', 'Loan Shark Detector', 'Budget Boss Arena'],
       population: 450,
-      specialFeature: 'Advanced Budgeting Tools'
+      specialFeature: 'AI Budget Coach'
     },
     { 
       id: 'scam', 
-      name: 'Scam Alley', 
+      name: 'Scam Survival Zone', 
       icon: Shield, 
       color: 'from-red-500 to-orange-500',
-      description: 'Learn cybersecurity & scam detection',
+      description: 'Don\'t get finessed 🛡️',
       unlocked: true,
-      buildings: ['Security Center', 'Cyber Academy', 'Threat Lab', 'Safe House'],
+      buildings: ['Phishing Simulator', 'Romance Scam Lab', 'Crypto Rug Pull Detector', 'Social Engineering Arena'],
       population: 320,
-      specialFeature: 'Real-time Threat Detection'
+      specialFeature: 'Live Scam Alerts'
     },
     { 
       id: 'investment', 
-      name: 'Investment Park', 
+      name: 'Diamond Hands District', 
       icon: TrendingUp, 
       color: 'from-purple-500 to-pink-500',
-      description: 'Trading, investing & portfolio management',
+      description: 'To the moon or bust 🚀',
       unlocked: true,
-      buildings: ['Stock Exchange', 'Trading Floor', 'Portfolio Center', 'Risk Lab'],
+      buildings: ['Meme Stock Arena', 'Crypto Casino', 'YOLO Prevention Center', 'Paper Trading Gym'],
       population: 680,
-      specialFeature: 'Live Market Simulation'
+      specialFeature: 'FOMO Resistance Training'
     },
     { 
       id: 'market', 
-      name: 'Market Street', 
+      name: 'Impulse Buy Boulevard', 
       icon: ShoppingCart, 
       color: 'from-green-500 to-emerald-500',
-      description: 'Smart shopping & consumer protection',
+      description: 'Shop smart, not hard 🛍️',
       unlocked: true,
-      buildings: ['Shopping Mall', 'Local Market', 'Price Comparison Center', 'Consumer Rights Office'],
+      buildings: ['BNPL Trap House', 'Influencer Marketing Lab', 'Cart Abandonment Clinic', 'Subscription Graveyard'],
       population: 520,
-      specialFeature: 'Real Price Intelligence'
+      specialFeature: 'Anti-Impulse Shield'
     },
     { 
       id: 'reward', 
-      name: 'Reward Plaza', 
+      name: 'Flex Zone', 
       icon: Gift, 
       color: 'from-yellow-500 to-orange-500',
-      description: 'Spin wheels, collect NFTs & trade rewards',
+      description: 'Earn your bragging rights ✨',
       unlocked: true,
-      buildings: ['Reward Wheel', 'NFT Gallery', 'Trading Post', 'Achievement Hall'],
+      buildings: ['Gacha Machine', 'NFT Flex Gallery', 'Clout Exchange', 'Achievement Shrine'],
       population: 380,
-      specialFeature: 'Exclusive Digital Assets'
+      specialFeature: 'Limited Edition Drops'
     }
   ];
 
   const cityMissions: CityMission[] = [
     {
       id: '1',
-      title: 'Financial Literacy Master',
-      description: 'Complete all banking lessons and achieve 80+ financial literacy score',
+      title: 'Money Moves Mastery',
+      description: 'Survive 10 real-world money scenarios without going broke',
       district: 'bank',
       type: 'learning',
-      requirements: ['Complete 5 banking lessons', 'Score 80+ on financial literacy', 'Create a budget plan'],
+      requirements: ['Dodge 5 impulse purchases', 'Set up emergency fund', 'Avoid 3 subscription traps'],
       rewards: [
         { type: 'coins', amount: 500 },
-        { type: 'badge', amount: 1, name: 'Financial Expert' },
-        { type: 'nft', amount: 1, name: 'Golden Calculator' }
+        { type: 'badge', amount: 1, name: 'Money Boss' },
+        { type: 'nft', amount: 1, name: 'Diamond Hands Avatar' }
       ],
       progress: Math.min(progress.financialLiteracyScore, 80),
       maxProgress: 80,
       completed: progress.financialLiteracyScore >= 80,
       difficulty: 'medium',
-      estimatedTime: '2 hours'
+      estimatedTime: '30 min'
     },
     {
       id: '2',
-      title: 'Scam Fighter Champion',
-      description: 'Master cybersecurity and protect the community from threats',
+      title: 'Scam Slayer Supreme',
+      description: 'Don\'t fall for any tricks - become unscammable',
       district: 'scam',
       type: 'challenge',
-      requirements: ['Complete cybersecurity academy', 'Detect 10 scams correctly', 'Help 5 community members'],
+      requirements: ['Spot 15 scams in a row', 'Save 3 friends from scams', 'Complete phishing bootcamp'],
       rewards: [
         { type: 'coins', amount: 750 },
-        { type: 'badge', amount: 1, name: 'Cyber Guardian' },
-        { type: 'nft', amount: 1, name: 'Digital Shield' }
+        { type: 'badge', amount: 1, name: 'Unscammable' },
+        { type: 'nft', amount: 1, name: 'Anti-Scam Shield' }
       ],
       progress: Math.min(progress.milSkillScore, 100),
       maxProgress: 100,
       completed: progress.milSkillScore >= 75,
       difficulty: 'hard',
-      estimatedTime: '3 hours'
+      estimatedTime: '45 min'
     },
     {
       id: '3',
-      title: 'Investment Strategist',
-      description: 'Build a diversified portfolio and master trading fundamentals',
+      title: 'Diamond Hands Legend',
+      description: 'Make smart investments without FOMO or panic selling',
       district: 'investment',
       type: 'collection',
-      requirements: ['Complete trading academy', 'Build portfolio worth $100k', 'Avoid investment scams'],
+      requirements: ['Resist 5 FOMO trades', 'Hold through 3 market crashes', 'Spot 2 pump & dumps'],
       rewards: [
         { type: 'coins', amount: 1000 },
-        { type: 'badge', amount: 1, name: 'Portfolio Master' },
-        { type: 'nft', amount: 1, name: 'Trading Crown' }
+        { type: 'badge', amount: 1, name: 'Diamond Hands' },
+        { type: 'nft', amount: 1, name: 'Rocket Ship NFT' }
       ],
       progress: 45,
       maxProgress: 100,
       completed: false,
       difficulty: 'hard',
-      estimatedTime: '4 hours'
+      estimatedTime: '1 hour'
     },
     {
       id: '4',
-      title: 'Smart Shopper Elite',
-      description: 'Master bargaining and avoid all shopping scams',
+      title: 'Anti-Impulse Champion',
+      description: 'Resist the urge to buy everything you see online',
       district: 'market',
       type: 'exploration',
-      requirements: ['Visit all market areas', 'Complete bargaining challenges', 'Identify 5 shopping scams'],
+      requirements: ['Abandon 10 shopping carts', 'Unsubscribe from 5 services', 'Resist 3 flash sales'],
       rewards: [
         { type: 'coins', amount: 400 },
-        { type: 'badge', amount: 1, name: 'Bargain Hunter' },
-        { type: 'nft', amount: 1, name: 'Market Crown' }
+        { type: 'badge', amount: 1, name: 'Impulse Killer' },
+        { type: 'nft', amount: 1, name: 'Self-Control Crown' }
       ],
       progress: 30,
       maxProgress: 100,
       completed: false,
       difficulty: 'medium',
-      estimatedTime: '1.5 hours'
+      estimatedTime: '20 min'
     },
     {
       id: '5',
-      title: 'Treasure Collector',
-      description: 'Collect rare NFTs and build an impressive digital collection',
+      title: 'Flex Master Supreme',
+      description: 'Collect the rarest digital assets and flex on everyone',
       district: 'reward',
       type: 'collection',
-      requirements: ['Spin wheel 20 times', 'Collect 5 rare NFTs', 'Trade with other players'],
+      requirements: ['Get 3 legendary drops', 'Trade 5 NFTs', 'Reach 10k clout points'],
       rewards: [
         { type: 'coins', amount: 300 },
-        { type: 'badge', amount: 1, name: 'Collector Supreme' },
-        { type: 'nft', amount: 1, name: 'Legendary Vault' }
+        { type: 'badge', amount: 1, name: 'Ultimate Flexer' },
+        { type: 'nft', amount: 1, name: 'Golden Flex Badge' }
       ],
       progress: 15,
       maxProgress: 100,
       completed: false,
       difficulty: 'easy',
-      estimatedTime: '2 hours'
+      estimatedTime: '30 min'
+    }
+  ];
+
+  const genZScenarios: GenZScenario[] = [
+    {
+      id: '1',
+      type: 'shopping',
+      title: '🔥 FLASH SALE ALERT',
+      situation: 'Your favorite influencer just posted a 24-hour flash sale',
+      context: 'That jacket you\'ve been wanting is 50% off but only for the next 2 hours! Your friends are all buying it and posting stories. You have $200 in your account and rent is due in 5 days.',
+      timeLimit: 30,
+      options: [
+        {
+          id: 'a',
+          text: 'YOLO, buy it now! 🛍️',
+          emoji: '💸',
+          consequence: 'You bought the jacket but now you\'re short on rent money',
+          moneyImpact: -120,
+          creditImpact: 0,
+          stressLevel: 8,
+          aiResponse: 'Bruh... that FOMO hit different but your future self is crying rn 😭',
+          isOptimal: false
+        },
+        {
+          id: 'b',
+          text: 'Add to wishlist, check budget first 📝',
+          emoji: '🧠',
+          consequence: 'Smart move! You avoided impulse buying and kept your rent money safe',
+          moneyImpact: 0,
+          creditImpact: 0,
+          stressLevel: 2,
+          aiResponse: 'PERIODT! That\'s some big brain energy right there 🧠✨',
+          isOptimal: true
+        },
+        {
+          id: 'c',
+          text: 'Use BNPL - pay later! 💳',
+          emoji: '⚠️',
+          consequence: 'You got the jacket but now have 4 payments of $30 to worry about',
+          moneyImpact: -30,
+          creditImpact: -10,
+          stressLevel: 6,
+          aiResponse: 'BNPL is a trap bestie... those payments add up FAST 📈',
+          isOptimal: false
+        }
+      ],
+      urgency: 'high',
+      platform: 'instagram',
+      reward: 100,
+      streakBonus: 25
+    },
+    {
+      id: '2',
+      type: 'crypto',
+      title: '🚀 MOONSHOT OPPORTUNITY',
+      situation: 'Your Discord group is going crazy over a new crypto',
+      context: 'Everyone\'s saying this new token is about to 100x. Your friend just made $500 in 10 minutes. The chart is going parabolic and FOMO is hitting HARD.',
+      timeLimit: 45,
+      options: [
+        {
+          id: 'a',
+          text: 'APE IN! TO THE MOON! 🚀',
+          emoji: '🌙',
+          consequence: 'You bought at the peak... it crashed 80% the next day',
+          moneyImpact: -400,
+          creditImpact: 0,
+          stressLevel: 10,
+          aiResponse: 'Oof... you got rekt by FOMO. This is why we don\'t chase pumps 📉',
+          isOptimal: false
+        },
+        {
+          id: 'b',
+          text: 'Research first, invest small 🔍',
+          emoji: '🤓',
+          consequence: 'You missed the pump but avoided the dump. Your money is safe.',
+          moneyImpact: 0,
+          creditImpact: 0,
+          stressLevel: 3,
+          aiResponse: 'W move! Better to miss gains than lose everything. You\'re built different 💪',
+          isOptimal: true
+        },
+        {
+          id: 'c',
+          text: 'Put in half my savings 💰',
+          emoji: '😰',
+          consequence: 'Moderate loss but you still have some money left',
+          moneyImpact: -200,
+          creditImpact: 0,
+          stressLevel: 7,
+          aiResponse: 'Could\'ve been worse but never risk money you can\'t afford to lose 😬',
+          isOptimal: false
+        }
+      ],
+      urgency: 'extreme',
+      platform: 'discord',
+      reward: 150,
+      streakBonus: 50
+    },
+    {
+      id: '3',
+      type: 'bnpl',
+      title: '💳 BUY NOW, PAY LATER',
+      situation: 'Checkout page offering 4 easy payments',
+      context: 'You\'re buying a $400 gaming setup. The site offers 4 payments of $100 with no interest. Seems like a good deal since you get paid next week.',
+      timeLimit: 60,
+      options: [
+        {
+          id: 'a',
+          text: 'Sounds good, split it up! 📅',
+          emoji: '💳',
+          consequence: 'You now have 4 monthly payments to remember and budget for',
+          moneyImpact: -100,
+          creditImpact: -5,
+          stressLevel: 5,
+          aiResponse: 'BNPL seems easy but it\'s just debt with extra steps... be careful 👀',
+          isOptimal: false
+        },
+        {
+          id: 'b',
+          text: 'Save up and buy later 💪',
+          emoji: '⏰',
+          consequence: 'You waited, saved up, and bought it without any debt stress',
+          moneyImpact: 0,
+          creditImpact: 0,
+          stressLevel: 1,
+          aiResponse: 'THAT\'S the energy! Delayed gratification hits different when you own it outright 🔥',
+          isOptimal: true
+        },
+        {
+          id: 'c',
+          text: 'Use credit card instead 💸',
+          emoji: '📈',
+          consequence: 'Higher interest rate but more flexible payments',
+          moneyImpact: -400,
+          creditImpact: -15,
+          stressLevel: 7,
+          aiResponse: 'Credit cards have higher interest than BNPL... this ain\'t it chief 😅',
+          isOptimal: false
+        }
+      ],
+      urgency: 'medium',
+      platform: 'shopping_app',
+      reward: 120,
+      streakBonus: 30
+    },
+    {
+      id: '4',
+      type: 'social',
+      title: '💕 ROMANCE SCAM ALERT',
+      situation: 'Your online crush needs emergency money',
+      context: 'You\'ve been talking to someone amazing for 2 weeks. They say they\'re stuck abroad and need $300 for a flight home. They promise to pay you back with interest.',
+      timeLimit: 90,
+      options: [
+        {
+          id: 'a',
+          text: 'Send the money, love is real! 💕',
+          emoji: '💸',
+          consequence: 'You got scammed. They blocked you and disappeared with your money.',
+          moneyImpact: -300,
+          creditImpact: 0,
+          stressLevel: 9,
+          aiResponse: 'Nooo bestie... that\'s a classic romance scam. Never send money to online strangers 💔',
+          isOptimal: false
+        },
+        {
+          id: 'b',
+          text: 'Ask for video call first 📹',
+          emoji: '🤔',
+          consequence: 'They make excuses and eventually block you. Scam avoided!',
+          moneyImpact: 0,
+          creditImpact: 0,
+          stressLevel: 4,
+          aiResponse: 'Smart! Real people can video call. You dodged a bullet there 🛡️',
+          isOptimal: true
+        },
+        {
+          id: 'c',
+          text: 'Send half to test them 🤷‍♀️',
+          emoji: '😬',
+          consequence: 'Still got scammed but lost less money',
+          moneyImpact: -150,
+          creditImpact: 0,
+          stressLevel: 6,
+          aiResponse: 'Any amount is too much for online strangers... but at least it wasn\'t everything 😔',
+          isOptimal: false
+        }
+      ],
+      urgency: 'high',
+      platform: 'dating_app',
+      reward: 200,
+      streakBonus: 75
+    },
+    {
+      id: '5',
+      type: 'subscription',
+      title: '📱 SUBSCRIPTION TRAP',
+      situation: 'Free trial ending soon notification',
+      context: 'You signed up for a "free" 7-day trial of a meditation app. It\'s about to charge you $19.99/month. You used it twice.',
+      timeLimit: 120,
+      options: [
+        {
+          id: 'a',
+          text: 'Keep it, might use it more 🧘‍♀️',
+          emoji: '💸',
+          consequence: 'You\'re now paying $20/month for an app you rarely use',
+          moneyImpact: -20,
+          creditImpact: 0,
+          stressLevel: 3,
+          aiResponse: 'Subscription creep is real... those $20s add up to hundreds per year 📊',
+          isOptimal: false
+        },
+        {
+          id: 'b',
+          text: 'Cancel immediately! ❌',
+          emoji: '✂️',
+          consequence: 'You cancelled and saved $240 per year. Smart move!',
+          moneyImpact: 0,
+          creditImpact: 0,
+          stressLevel: 1,
+          aiResponse: 'YES! Cancel culture but make it subscriptions. You just saved $240/year 💰',
+          isOptimal: true
+        },
+        {
+          id: 'c',
+          text: 'Forget about it 🤷‍♀️',
+          emoji: '😴',
+          consequence: 'You forgot and got charged. Now you have another subscription to track.',
+          moneyImpact: -20,
+          creditImpact: 0,
+          stressLevel: 4,
+          aiResponse: 'Forgetting subscriptions is how they get you... set calendar reminders! ⏰',
+          isOptimal: false
+        }
+      ],
+      urgency: 'medium',
+      platform: 'smartphone',
+      reward: 80,
+      streakBonus: 20
     }
   ];
 
   const samplePopupCases: PopupCase[] = [
     {
       id: '1',
-      type: 'scam_alert',
-      title: '🚨 Urgent Scam Alert!',
-      message: 'A new phishing email is targeting bank customers. Someone claiming to be from Vietcombank is asking for account verification. What do you do?',
+      type: 'gen_z_scenario',
+      title: '🔥 FLASH SALE FOMO',
+      message: 'Your fave influencer just dropped a 2-hour flash sale! That jacket you\'ve been eyeing is 50% off but rent is due in 5 days...',
       options: [
-        { id: 'a', text: 'Click the link to verify', reward: -50, consequence: 'You fell for the scam and lost coins!' },
-        { id: 'b', text: 'Call the bank directly', reward: 100, consequence: 'Smart choice! You avoided the scam and earned coins!' },
-        { id: 'c', text: 'Ignore the email', reward: 25, consequence: 'Safe choice, but you could have helped others by reporting it.' }
+        { id: 'a', text: 'YOLO buy it! 🛍️', reward: -50, consequence: 'FOMO got you... now you\'re short on rent 😭' },
+        { id: 'b', text: 'Check budget first 🧠', reward: 100, consequence: 'Big brain move! Your future self thanks you ✨' },
+        { id: 'c', text: 'Use BNPL 💳', reward: -25, consequence: 'BNPL trap activated... those payments add up fast 📈' }
       ],
       urgency: 'high',
+      timeLimit: 30,
       icon: AlertTriangle,
-      color: 'from-red-500 to-orange-500'
+      color: 'from-red-500 to-orange-500',
+      platform: 'Instagram'
     },
     {
       id: '2',
-      type: 'investment_tip',
-      title: '💡 Market Opportunity',
-      message: 'VCB stock just announced a 15% dividend increase. The price is up 3% today. What\'s your move?',
+      type: 'crypto_hype',
+      title: '🚀 MOONSHOT ALERT',
+      message: 'Your Discord is going CRAZY over this new token! Everyone\'s saying it\'s about to 100x. FOMO is hitting hard...',
       options: [
-        { id: 'a', text: 'Buy immediately', reward: -25, consequence: 'You bought at a peak! Wait for better entry points.' },
-        { id: 'b', text: 'Research and wait', reward: 75, consequence: 'Wise! Good investors research before acting.' },
-        { id: 'c', text: 'Set a limit order', reward: 100, consequence: 'Excellent strategy! You\'ll buy at your target price.' }
+        { id: 'a', text: 'APE IN! 🌙', reward: -100, consequence: 'You bought the top... it crashed 80% next day 📉' },
+        { id: 'b', text: 'Research first 🔍', reward: 150, consequence: 'Missed the pump, avoided the dump. W move! 💪' },
+        { id: 'c', text: 'YOLO half savings 💰', reward: -75, consequence: 'Could\'ve been worse but never risk what you can\'t lose 😬' }
       ],
-      urgency: 'medium',
+      urgency: 'extreme',
+      timeLimit: 45,
       icon: TrendingUp,
-      color: 'from-green-500 to-blue-500'
+      color: 'from-purple-500 to-pink-500',
+      platform: 'Discord'
     },
     {
       id: '3',
-      type: 'budget_warning',
-      title: '⚠️ Budget Alert',
-      message: 'You\'ve spent 90% of your entertainment budget this month. There are still 10 days left!',
+      type: 'bnpl_trap',
+      title: '💳 BNPL TEMPTATION',
+      message: 'Checkout is offering 4 easy payments of $100 for that gaming setup. No interest! Seems legit...',
       options: [
-        { id: 'a', text: 'Continue spending normally', reward: -30, consequence: 'You went over budget and had to use savings.' },
-        { id: 'b', text: 'Cut entertainment spending', reward: 50, consequence: 'Good discipline! You stayed within budget.' },
-        { id: 'c', text: 'Find free activities', reward: 75, consequence: 'Creative solution! You saved money and had fun.' }
+        { id: 'a', text: 'Split it up! 📅', reward: -30, consequence: 'BNPL is just debt with extra steps... be careful 👀' },
+        { id: 'b', text: 'Save up first 💪', reward: 120, consequence: 'Delayed gratification hits different! You own it outright 🔥' },
+        { id: 'c', text: 'Credit card instead 💸', reward: -50, consequence: 'Higher interest than BNPL... this ain\'t it chief 😅' }
       ],
       urgency: 'medium',
+      timeLimit: 60,
       icon: AlertTriangle,
-      color: 'from-yellow-500 to-red-500'
+      color: 'from-blue-500 to-cyan-500',
+      platform: 'Shopping App'
     },
     {
       id: '4',
-      type: 'achievement',
-      title: '🏆 Achievement Unlocked!',
-      message: 'Congratulations! You\'ve completed 10 daily challenges in a row!',
-      reward: 200,
-      urgency: 'low',
-      autoClose: 5000,
-      icon: Trophy,
-      color: 'from-yellow-500 to-orange-500'
+      type: 'fomo_alert',
+      title: '💕 ROMANCE SCAM INCOMING',
+      message: 'Your online crush needs $300 for an emergency flight home. They promise to pay back with interest...',
+      options: [
+        { id: 'a', text: 'Send money! 💕', reward: -300, consequence: 'Classic romance scam... never send money to online strangers 💔' },
+        { id: 'b', text: 'Video call first 📹', reward: 200, consequence: 'They made excuses and blocked you. Scam avoided! 🛡️' },
+        { id: 'c', text: 'Send half to test 🤷‍♀️', reward: -150, consequence: 'Any amount is too much for strangers... but could\'ve been worse 😔' }
+      ],
+      urgency: 'high',
+      timeLimit: 90,
+      icon: Heart,
+      color: 'from-pink-500 to-red-500',
+      platform: 'Dating App'
     },
     {
       id: '5',
+      type: 'impulse_buy',
+      title: '📱 SUBSCRIPTION TRAP',
+      message: 'Free trial ending! That meditation app you used twice is about to charge $19.99/month...',
+      options: [
+        { id: 'a', text: 'Keep it 🧘‍♀️', reward: -20, consequence: 'Subscription creep is real... those $20s add up to hundreds 📊' },
+        { id: 'b', text: 'Cancel now! ❌', reward: 80, consequence: 'Cancel culture but make it subscriptions! Saved $240/year 💰' },
+        { id: 'c', text: 'Forget about it 🤷‍♀️', reward: -20, consequence: 'Forgetting subscriptions is how they get you... set reminders! ⏰' }
+      ],
+      urgency: 'low',
+      timeLimit: 120,
+      icon: Smartphone,
+      color: 'from-green-500 to-blue-500',
+      platform: 'Phone'
+    },
+    {
+      id: '6',
       type: 'daily_bonus',
-      title: '🎁 Daily Login Bonus',
-      message: 'Welcome back! Here\'s your daily bonus for consistent learning.',
-      reward: 50,
+      title: '🎁 Daily Survival Bonus',
+      message: 'You survived another day without getting finessed! Here\'s your reward.',
+      reward: 100,
       urgency: 'low',
       autoClose: 3000,
       icon: Gift,
       color: 'from-purple-500 to-pink-500'
     },
     {
-      id: '6',
+      id: '7',
       type: 'market_news',
-      title: '📈 Market Update',
-      message: 'Breaking: Vietnamese stock market hits new high! VN-Index up 2.5% on strong banking sector performance.',
+      title: '📈 Market Tea ☕',
+      message: 'Breaking: Crypto market is having a moment! Bitcoin up 15% but remember - what goes up...',
       urgency: 'low',
       autoClose: 4000,
       icon: TrendingUp,
       color: 'from-green-500 to-emerald-500'
     },
     {
-      id: '7',
-      type: 'security_alert',
-      title: '🔒 Security Reminder',
-      message: 'Remember to enable 2FA on your banking apps! Cybersecurity is everyone\'s responsibility.',
+      id: '8',
+      type: 'achievement',
+      title: '🏆 STREAK LEGEND!',
+      message: 'You\'ve made 10 smart money decisions in a row! You\'re officially unscammable 💪',
+      reward: 500,
       urgency: 'medium',
-      autoClose: 6000,
-      icon: Shield,
-      color: 'from-blue-500 to-cyan-500'
+      autoClose: 5000,
+      icon: Trophy,
+      color: 'from-yellow-500 to-orange-500'
     }
   ];
 
@@ -356,20 +660,97 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
     setActiveMissions(cityMissions);
     setNotifications(sampleNotifications);
 
-    // Simulate random popup cases
+    // Simulate random Gen Z scenarios and popup cases
     const popupInterval = setInterval(() => {
       if (!popupCase && Math.random() < 0.3) {
-        const randomCase = samplePopupCases[Math.floor(Math.random() * samplePopupCases.length)];
-        setPopupCase(randomCase);
+        // 70% chance for Gen Z scenario, 30% for regular popup
+        if (Math.random() < 0.7) {
+          const randomScenario = genZScenarios[Math.floor(Math.random() * genZScenarios.length)];
+          setCurrentGenZScenario(randomScenario);
+          setScenarioTimeLeft(randomScenario.timeLimit);
+        } else {
+          const randomCase = samplePopupCases[Math.floor(Math.random() * samplePopupCases.length)];
+          setPopupCase(randomCase);
+        }
         
-        if (randomCase.autoClose) {
-          setTimeout(() => setPopupCase(null), randomCase.autoClose);
+        if (popupCase?.autoClose) {
+          setTimeout(() => setPopupCase(null), popupCase.autoClose);
         }
       }
-    }, 15000);
+    }, 10000); // More frequent scenarios
 
     return () => clearInterval(popupInterval);
-  }, [popupCase]);
+  }, [popupCase, currentGenZScenario]);
+
+  // Countdown timer for Gen Z scenarios
+  useEffect(() => {
+    if (currentGenZScenario && scenarioTimeLeft > 0) {
+      const timer = setTimeout(() => {
+        setScenarioTimeLeft(prev => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (currentGenZScenario && scenarioTimeLeft === 0) {
+      // Time's up! Auto-select worst option
+      handleGenZScenarioResponse(currentGenZScenario.options[0].id);
+    }
+  }, [currentGenZScenario, scenarioTimeLeft]);
+
+  const getAIFeedback = (isOptimal: boolean, aiResponse: string): AIFeedback => {
+    const personalities = ['supportive', 'savage', 'wise', 'hype'] as const;
+    const personality = personalities[Math.floor(Math.random() * personalities.length)];
+    
+    return {
+      personality,
+      message: aiResponse,
+      tips: isOptimal 
+        ? ['You\'re getting good at this!', 'Keep making smart choices', 'Your future self is proud']
+        : ['Learn from this mistake', 'Everyone messes up sometimes', 'Try again and do better'],
+      memeReference: isOptimal ? 'Big brain energy 🧠' : 'This ain\'t it chief 😅'
+    };
+  };
+
+  const handleGenZScenarioResponse = (optionId: string) => {
+    if (!currentGenZScenario) return;
+    
+    const selectedOption = currentGenZScenario.options.find(opt => opt.id === optionId);
+    if (selectedOption) {
+      // Update coins and progress
+      addCoins(selectedOption.moneyImpact);
+      
+      if (selectedOption.isOptimal) {
+        setStreak(prev => prev + 1);
+        addCoins(currentGenZScenario.reward + (streak * currentGenZScenario.streakBonus));
+        updateProgress({ 
+          financialLiteracyScore: progress.financialLiteracyScore + 10,
+          milSkillScore: progress.milSkillScore + 15
+        });
+      } else {
+        setStreak(0);
+        setDailyFailures(prev => prev + 1);
+        updateProgress({ 
+          milSkillScore: Math.max(0, progress.milSkillScore - 5)
+        });
+      }
+      
+      // Show AI feedback
+      const feedback = getAIFeedback(selectedOption.isOptimal, selectedOption.aiResponse);
+      
+      // Add notification about the result
+      const newNotification: NotificationItem = {
+        id: Date.now().toString(),
+        type: selectedOption.isOptimal ? 'achievement' : 'warning',
+        title: selectedOption.isOptimal ? '🔥 Smart Move!' : '😬 Lesson Learned',
+        message: feedback.message,
+        timestamp: 'Just now',
+        read: false
+      };
+      
+      setNotifications(prev => [newNotification, ...prev]);
+    }
+    
+    setCurrentGenZScenario(null);
+    setScenarioTimeLeft(0);
+  };
 
   const handlePopupResponse = (optionId: string) => {
     if (!popupCase || !popupCase.options) return;
@@ -463,6 +844,116 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
     </div>
   );
 
+  const renderGenZScenario = () => {
+    if (!currentGenZScenario) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900 p-1 rounded-2xl max-w-md w-full animate-slideUp">
+          <div className="bg-gray-900/95 backdrop-blur-lg rounded-xl p-6">
+            {/* Platform Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  {currentGenZScenario.platform === 'instagram' && <Smartphone className="text-white" size={16} />}
+                  {currentGenZScenario.platform === 'discord' && <MessageCircle className="text-white" size={16} />}
+                  {currentGenZScenario.platform === 'shopping_app' && <ShoppingBag className="text-white" size={16} />}
+                  {currentGenZScenario.platform === 'dating_app' && <Heart className="text-white" size={16} />}
+                  {currentGenZScenario.platform === 'smartphone' && <Smartphone className="text-white" size={16} />}
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">{currentGenZScenario.title}</h3>
+                  <p className="text-purple-300 text-sm capitalize">{currentGenZScenario.platform.replace('_', ' ')}</p>
+                </div>
+              </div>
+              
+              {/* Timer */}
+              <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+                scenarioTimeLeft <= 10 ? 'bg-red-500/30 text-red-200' :
+                scenarioTimeLeft <= 30 ? 'bg-yellow-500/30 text-yellow-200' :
+                'bg-green-500/30 text-green-200'
+              }`}>
+                <Clock size={16} />
+                <span className="font-bold">{scenarioTimeLeft}s</span>
+              </div>
+            </div>
+
+            {/* Scenario Content */}
+            <div className="mb-6">
+              <p className="text-purple-200 mb-2">{currentGenZScenario.situation}</p>
+              <div className="bg-white/10 rounded-lg p-4 border-l-4 border-purple-500">
+                <p className="text-white italic">"{currentGenZScenario.context}"</p>
+              </div>
+            </div>
+
+            {/* Urgency Indicator */}
+            <div className={`flex items-center space-x-2 mb-4 px-3 py-2 rounded-lg ${
+              currentGenZScenario.urgency === 'extreme' ? 'bg-red-500/30 border border-red-500/50' :
+              currentGenZScenario.urgency === 'high' ? 'bg-orange-500/30 border border-orange-500/50' :
+              currentGenZScenario.urgency === 'medium' ? 'bg-yellow-500/30 border border-yellow-500/50' :
+              'bg-green-500/30 border border-green-500/50'
+            }`}>
+              <Flame className={
+                currentGenZScenario.urgency === 'extreme' ? 'text-red-400' :
+                currentGenZScenario.urgency === 'high' ? 'text-orange-400' :
+                currentGenZScenario.urgency === 'medium' ? 'text-yellow-400' :
+                'text-green-400'
+              } size={16} />
+              <span className="text-white text-sm font-medium">
+                {currentGenZScenario.urgency.toUpperCase()} URGENCY
+              </span>
+            </div>
+
+            {/* Options */}
+            <div className="space-y-3">
+              {currentGenZScenario.options.map(option => (
+                <button
+                  key={option.id}
+                  onClick={() => handleGenZScenarioResponse(option.id)}
+                  className="w-full text-left p-4 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 hover:border-white/40 transition-all group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl">{option.emoji}</span>
+                      <span className="text-white font-medium">{option.text}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {option.moneyImpact !== 0 && (
+                        <span className={`text-sm font-medium ${
+                          option.moneyImpact > 0 ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                          {option.moneyImpact > 0 ? '+' : ''}${option.moneyImpact}
+                        </span>
+                      )}
+                      <div className={`w-2 h-2 rounded-full ${
+                        option.stressLevel <= 3 ? 'bg-green-400' :
+                        option.stressLevel <= 6 ? 'bg-yellow-400' :
+                        'bg-red-400'
+                      }`} />
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Rewards */}
+            <div className="mt-4 flex items-center justify-between text-sm">
+              <div className="flex items-center space-x-4">
+                <span className="text-purple-300">Base Reward: +{currentGenZScenario.reward} coins</span>
+                {streak > 0 && (
+                  <span className="text-yellow-400">Streak Bonus: +{streak * currentGenZScenario.streakBonus}</span>
+                )}
+              </div>
+              <div className="text-purple-400">
+                Current Streak: {streak} 🔥
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderPopupCase = () => {
     if (!popupCase) return null;
 
@@ -478,6 +969,11 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
                 <div>
                   <h3 className="text-white font-bold text-lg">{popupCase.title}</h3>
                   <div className="flex items-center space-x-2">
+                    {popupCase.platform && (
+                      <span className="px-2 py-1 bg-white/20 text-white rounded text-xs">
+                        {popupCase.platform}
+                      </span>
+                    )}
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       popupCase.urgency === 'high' ? 'bg-red-500/30 text-red-200' :
                       popupCase.urgency === 'medium' ? 'bg-yellow-500/30 text-yellow-200' :
@@ -487,6 +983,9 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
                     </span>
                     {popupCase.reward && (
                       <span className="text-yellow-400 text-sm">+{popupCase.reward} coins</span>
+                    )}
+                    {popupCase.timeLimit && (
+                      <span className="text-purple-300 text-sm">{popupCase.timeLimit}s</span>
                     )}
                   </div>
                 </div>
@@ -690,20 +1189,36 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       {/* City Header */}
       <div className="text-center">
         <Map className="mx-auto mb-4 text-purple-400" size={64} />
-        <h1 className="text-4xl font-bold text-white mb-2">FinVerse City</h1>
-        <p className="text-purple-200 text-lg">Explore districts, complete missions, and master financial skills!</p>
+        <h1 className="text-4xl font-bold text-white mb-2">FinVerse City 🏙️</h1>
+        <p className="text-purple-200 text-lg">Where Gen Z learns money skills without the boring lectures!</p>
+        
+        {/* Streak Display */}
+        <div className="mt-4 flex items-center justify-center space-x-6">
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 px-4 py-2 rounded-full border border-orange-500/30">
+            <Flame className="text-orange-400" size={20} />
+            <span className="text-white font-bold">{streak} Day Streak</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 px-4 py-2 rounded-full border border-green-500/30">
+            <Trophy className="text-green-400" size={20} />
+            <span className="text-white font-bold">Level {progress.level}</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 px-4 py-2 rounded-full border border-purple-500/30">
+            <Brain className="text-purple-400" size={20} />
+            <span className="text-white font-bold">{Math.max(0, 10 - dailyFailures)} Lives Left</span>
+          </div>
+        </div>
       </div>
 
       {/* City Stats */}
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-        <h2 className="text-white font-bold text-xl mb-4">City Statistics</h2>
+        <h2 className="text-white font-bold text-xl mb-4">City Vibes Check 📊</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {[
-            { name: 'Population', value: cityStats.population, icon: Users, color: 'text-blue-400' },
-            { name: 'Happiness', value: `${cityStats.happiness}%`, icon: Star, color: 'text-yellow-400' },
-            { name: 'Security', value: `${cityStats.security}%`, icon: Shield, color: 'text-red-400' },
-            { name: 'Economy', value: `${cityStats.economy}%`, icon: TrendingUp, color: 'text-green-400' },
-            { name: 'Education', value: `${cityStats.education}%`, icon: Brain, color: 'text-purple-400' }
+            { name: 'Gen Z Population', value: cityStats.population, icon: Users, color: 'text-blue-400' },
+            { name: 'Happiness Level', value: `${cityStats.happiness}%`, icon: Star, color: 'text-yellow-400' },
+            { name: 'Scam Resistance', value: `${cityStats.security}%`, icon: Shield, color: 'text-red-400' },
+            { name: 'Money Moves', value: `${cityStats.economy}%`, icon: TrendingUp, color: 'text-green-400' },
+            { name: 'Financial IQ', value: `${cityStats.education}%`, icon: Brain, color: 'text-purple-400' }
           ].map(stat => (
             <div key={stat.name} className="text-center">
               <stat.icon className={`mx-auto mb-2 ${stat.color}`} size={24} />
@@ -721,14 +1236,14 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
 
       {/* Quick Actions */}
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-        <h2 className="text-white font-bold text-xl mb-4">Quick Actions</h2>
+        <h2 className="text-white font-bold text-xl mb-4">Quick Moves ⚡</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
             onClick={() => onNavigate('challenge')}
             className="bg-gradient-to-r from-orange-600 to-red-600 text-white p-4 rounded-xl hover:from-orange-700 hover:to-red-700 transition-colors"
           >
             <Calendar className="mx-auto mb-2" size={24} />
-            <div className="font-semibold text-sm">Daily Challenge</div>
+            <div className="font-semibold text-sm">Daily Survival</div>
           </button>
           
           <button
@@ -736,7 +1251,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
             className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white p-4 rounded-xl hover:from-yellow-700 hover:to-orange-700 transition-colors"
           >
             <Gift className="mx-auto mb-2" size={24} />
-            <div className="font-semibold text-sm">Spin Wheel</div>
+            <div className="font-semibold text-sm">Flex Zone</div>
           </button>
           
           <button
@@ -744,7 +1259,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
             className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-4 rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-colors"
           >
             <Users className="mx-auto mb-2" size={24} />
-            <div className="font-semibold text-sm">Community</div>
+            <div className="font-semibold text-sm">Squad Up</div>
           </button>
           
           <button
@@ -752,7 +1267,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
             className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-colors"
           >
             <Target className="mx-auto mb-2" size={24} />
-            <div className="font-semibold text-sm">Missions</div>
+            <div className="font-semibold text-sm">Quests</div>
           </button>
         </div>
       </div>
@@ -760,7 +1275,7 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       {/* Active Missions Preview */}
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-white font-bold text-xl">Active Missions</h2>
+          <h2 className="text-white font-bold text-xl">Active Quests 🎯</h2>
           <button
             onClick={() => setShowMissionPanel(true)}
             className="text-purple-300 hover:text-white text-sm transition-colors"
@@ -917,6 +1432,9 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       {/* Popup Cases */}
       {popupCase && renderPopupCase()}
 
+      {/* Gen Z Scenarios */}
+      {currentGenZScenario && renderGenZScenario()}
+
       {/* Notification Panel */}
       {showNotifications && renderNotificationPanel()}
 
@@ -924,12 +1442,16 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
       {showMissionPanel && renderMissionPanel()}
 
       {/* Background Overlay for Panels */}
-      {(showNotifications || showMissionPanel) && (
+      {(showNotifications || showMissionPanel || currentGenZScenario) && (
         <div 
           className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30"
           onClick={() => {
             setShowNotifications(false);
             setShowMissionPanel(false);
+            if (currentGenZScenario) {
+              // Auto-select first (worst) option if they click away
+              handleGenZScenarioResponse(currentGenZScenario.options[0].id);
+            }
           }}
         />
       )}
