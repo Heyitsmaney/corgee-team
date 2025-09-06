@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Building2, ShoppingCart, TrendingUp, Shield, Gift, Map, Coins, Trophy, Star, Bell, AlertTriangle, X, CheckCircle, Eye, Brain, Zap, Target, Award, Clock, Users, MessageCircle, Play, Pause, Volume2, VolumeX, Calendar, Smartphone, CreditCard, Heart, Flame, TrendingDown, DollarSign, Coffee, TowerControl as GameController2, Headphones, ShoppingBag, Wifi, Battery, Signal, Sparkles, Crown, Gem, Lightning, Rocket, Gamepad } from 'lucide-react';
+import { ArrowLeft, Building2, ShoppingCart, TrendingUp, Shield, Gift, Map, Coins, Trophy, Star, Bell, AlertTriangle, X, CheckCircle, Eye, Brain, Zap, Target, Award, Clock, Users, MessageCircle, Play, Pause, Volume2, VolumeX, Calendar, Smartphone, CreditCard, Heart, Flame, TrendingDown, DollarSign, Coffee, TowerControl as GameController2, Headphones, ShoppingBag, Wifi, Battery, Signal, Sparkles, Crown, Gem, CloudLightning as Lightning, Rocket, Gamepad } from 'lucide-react';
 import { BankDistrict } from './districts/BankDistrict';
 import { ScamAlley } from './districts/ScamAlley';
 import { InvestmentPark } from './districts/InvestmentPark';
