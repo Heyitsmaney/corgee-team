@@ -22,7 +22,20 @@ import {
   Zap,
   Eye,
   BookOpen,
-  RefreshCw
+  RefreshCw,
+  Flame,
+  Heart,
+  Sparkles,
+  Crown,
+  Gem,
+  Lightning,
+  Rocket,
+  Headphones,
+  Gamepad,
+  Smartphone,
+  Wifi,
+  Battery,
+  Signal
 } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 
@@ -189,57 +202,76 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     }, 1000);
   };
 
+  const [streakMultiplier, setStreakMultiplier] = useState(1.5);
+  const [dailyStreak, setDailyStreak] = useState(7);
+  const [totalXP, setTotalXP] = useState(2450);
+  const [nextLevelXP, setNextLevelXP] = useState(3000);
+
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Real-time Update Header */}
-      <div className="flex items-center justify-between bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/10">
+      <div className="flex items-center justify-between glass rounded-xl p-4 border border-white/10 animate-slideInDown">
         <div className="flex items-center space-x-3">
-          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-          <span className="text-white text-sm">
+          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse-glow"></div>
+          <span className="text-white text-sm font-medium">
             Last updated: {realTimeData.lastUpdated.toLocaleTimeString()}
           </span>
         </div>
-        <button
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 bg-orange-500/20 px-3 py-2 rounded-full">
+            <Flame className="text-orange-400" size={16} />
+            <span className="text-orange-200 text-sm font-bold">{dailyStreak} day streak</span>
+          </div>
+          <button
           onClick={updateRealTimeData}
           disabled={realTimeData.isUpdating}
-          className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50"
+          className="flex items-center space-x-2 btn-primary px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 ripple"
         >
           <RefreshCw className={`${realTimeData.isUpdating ? 'animate-spin' : ''}`} size={16} />
           <span>Refresh</span>
         </button>
+        </div>
       </div>
 
-      {/* Progress Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-lg rounded-xl p-6 border border-blue-500/30">
+      {/* Enhanced Progress Cards with Animations */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="glass-colored rounded-xl p-6 border border-blue-500/30 interactive-card animate-slideInLeft">
           <div className="flex items-center justify-between mb-4">
-            <TrendingUp className="text-blue-400" size={24} />
-            <span className="text-blue-300 text-2xl font-bold">{progress.financialLiteracyScore}</span>
+            <div className="p-3 rounded-full bg-blue-500/20">
+              <TrendingUp className="text-blue-400" size={24} />
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-blue-300">{progress.financialLiteracyScore}</div>
+              <div className="text-blue-200 text-xs">Financial IQ</div>
+            </div>
           </div>
-          <h3 className="text-white font-semibold">Financial Literacy</h3>
-          <p className="text-blue-200 text-sm mb-3">Your knowledge score</p>
-          <div className="w-full bg-blue-900/30 rounded-full h-2 mb-2">
+          <h3 className="text-white font-semibold mb-2">Financial Mastery</h3>
+          <div className="w-full bg-blue-900/30 rounded-full h-3 mb-2">
             <div 
-              className="bg-blue-400 h-2 rounded-full transition-all duration-500"
+              className="progress-bar h-3 rounded-full"
               style={{ width: `${Math.min(progress.financialLiteracyScore, 100)}%` }}
             />
           </div>
           <div className="flex justify-between text-xs text-blue-300">
-            <span>Beginner</span>
+            <span>Rookie</span>
             <span>Expert</span>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 backdrop-blur-lg rounded-xl p-6 border border-red-500/30">
+        <div className="glass-colored rounded-xl p-6 border border-red-500/30 interactive-card animate-slideInUp" style={{animationDelay: '0.1s'}}>
           <div className="flex items-center justify-between mb-4">
-            <Shield className="text-red-400" size={24} />
-            <span className="text-red-300 text-2xl font-bold">{progress.milSkillScore}</span>
+            <div className="p-3 rounded-full bg-red-500/20">
+              <Shield className="text-red-400" size={24} />
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-red-300">{progress.milSkillScore}</div>
+              <div className="text-red-200 text-xs">Scam Shield</div>
+            </div>
           </div>
-          <h3 className="text-white font-semibold">Security Skills</h3>
-          <p className="text-red-200 text-sm mb-3">Scam detection ability</p>
-          <div className="w-full bg-red-900/30 rounded-full h-2 mb-2">
+          <h3 className="text-white font-semibold mb-2">Cyber Defense</h3>
+          <div className="w-full bg-red-900/30 rounded-full h-3 mb-2">
             <div 
-              className="bg-red-400 h-2 rounded-full transition-all duration-500"
+              className="bg-gradient-to-r from-red-500 to-orange-500 h-3 rounded-full transition-all duration-700"
               style={{ width: `${Math.min(progress.milSkillScore, 100)}%` }}
             />
           </div>
@@ -249,96 +281,124 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-lg rounded-xl p-6 border border-green-500/30">
+        <div className="glass-colored rounded-xl p-6 border border-purple-500/30 interactive-card animate-slideInDown" style={{animationDelay: '0.2s'}}>
           <div className="flex items-center justify-between mb-4">
-            <Target className="text-green-400" size={24} />
-            <span className="text-green-300 text-2xl font-bold">{progress.level}</span>
+            <div className="p-3 rounded-full bg-purple-500/20">
+              <Zap className="text-purple-400" size={24} />
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-purple-300">{totalXP}</div>
+              <div className="text-purple-200 text-xs">Total XP</div>
+            </div>
           </div>
-          <h3 className="text-white font-semibold">Level Progress</h3>
-          <p className="text-green-200 text-sm mb-3">Current level</p>
-          <div className="w-full bg-green-900/30 rounded-full h-2 mb-2">
+          <h3 className="text-white font-semibold mb-2">Experience Points</h3>
+          <div className="w-full bg-purple-900/30 rounded-full h-3 mb-2">
             <div 
-              className="bg-green-400 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${(progress.level / 10) * 100}%` }}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-700"
+              style={{ width: `${(totalXP / nextLevelXP) * 100}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-green-300">
+          <div className="flex justify-between text-xs text-purple-300">
             <span>Level {progress.level}</span>
             <span>Level {progress.level + 1}</span>
+          </div>
+        </div>
+
+        <div className="glass-colored rounded-xl p-6 border border-yellow-500/30 interactive-card animate-slideInRight" style={{animationDelay: '0.3s'}}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 rounded-full bg-yellow-500/20">
+              <Coins className="text-yellow-400" size={24} />
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-yellow-300">{progress.coins.toLocaleString()}</div>
+              <div className="text-yellow-200 text-xs">FinCoins</div>
+            </div>
+          </div>
+          <h3 className="text-white font-semibold mb-2">Digital Wallet</h3>
+          <div className="flex items-center space-x-2 text-xs">
+            <Crown className="text-yellow-400" size={12} />
+            <span className="text-yellow-200">Premium Member</span>
+          </div>
+          <div className="mt-2 text-xs text-yellow-300">
+            Streak Multiplier: {streakMultiplier}x
           </div>
         </div>
       </div>
 
       {/* Weekly Progress Chart */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+      <div className="glass rounded-xl p-6 border border-white/20 animate-slideInUp">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-white font-semibold text-xl flex items-center">
+          <h2 className="text-white font-semibold text-xl flex items-center gradient-text">
             <BarChart3 className="mr-2" size={24} />
             Weekly Progress (Real-time)
           </h2>
-          <div className="flex items-center space-x-4 text-sm">
+          <div className="flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+              <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
               <span className="text-blue-200">Financial</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+              <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
               <span className="text-red-200">Security</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-green-200">Challenges</span>
             </div>
           </div>
         </div>
         
-        <div className="grid grid-cols-7 gap-2 h-48">
+        <div className="grid grid-cols-7 gap-3 h-56">
           {weeklyProgress.map((day, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div className="flex-1 flex flex-col justify-end space-y-1 w-full">
+            <div key={index} className="flex flex-col items-center group">
+              <div className="flex-1 flex flex-col justify-end space-y-2 w-full">
                 <div 
-                  className="bg-blue-400 rounded-t"
+                  className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all duration-500 group-hover:shadow-lg group-hover:shadow-blue-400/50"
                   style={{ height: `${(day.financial / 100) * 100}%`, minHeight: '4px' }}
                 />
                 <div 
-                  className="bg-red-400 rounded-t"
+                  className="bg-gradient-to-t from-red-500 to-red-400 rounded-t-lg transition-all duration-500 group-hover:shadow-lg group-hover:shadow-red-400/50"
                   style={{ height: `${(day.security / 100) * 100}%`, minHeight: '4px' }}
                 />
                 <div 
-                  className="bg-green-400 rounded-t"
+                  className="bg-gradient-to-t from-green-500 to-green-400 rounded-t-lg transition-all duration-500 group-hover:shadow-lg group-hover:shadow-green-400/50"
                   style={{ height: `${(day.challenges / 5) * 100}%`, minHeight: '4px' }}
                 />
               </div>
-              <span className="text-purple-300 text-xs mt-2">{day.day}</span>
+              <span className="text-purple-300 text-xs mt-3 font-medium group-hover:text-white transition-colors">{day.day}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Recent Activities */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-        <h2 className="text-white font-semibold text-xl mb-4 flex items-center">
+      <div className="glass rounded-xl p-6 border border-white/20 animate-slideInUp" style={{animationDelay: '0.2s'}}>
+        <h2 className="text-white font-semibold text-xl mb-4 flex items-center gradient-text">
           <Activity className="mr-2" size={24} />
           Recent Activities (Live Feed)
         </h2>
         <div className="space-y-4">
           {recentActivities.map((activity, index) => (
-            <div key={index} className="flex items-center space-x-4 p-3 bg-white/5 rounded-lg">
-              <div className={`p-2 rounded-lg bg-white/10 ${activity.color}`}>
+            <div key={index} className="flex items-center space-x-4 p-4 glass-dark rounded-lg interactive-card">
+              <div className={`p-3 rounded-full bg-white/10 ${activity.color}`}>
                 <activity.icon size={20} />
               </div>
               <div className="flex-1">
                 <h3 className="text-white font-medium">{activity.title}</h3>
-                <p className="text-purple-300 text-sm">{activity.time}</p>
+                <p className="text-purple-300 text-sm flex items-center">
+                  <Clock size={12} className="mr-1" />
+                  {activity.time}
+                </p>
               </div>
-              <div className="text-yellow-400 font-semibold text-sm">
+              <div className="text-yellow-400 font-bold text-sm flex items-center">
+                <Coins size={16} className="mr-1" />
                 {activity.reward}
               </div>
             </div>
           ))}
         </div>
         <div className="mt-4 text-center">
-          <button className="text-purple-300 hover:text-white text-sm transition-colors">
+          <button className="text-purple-300 hover:text-white text-sm transition-colors font-medium">
             View All Activities →
           </button>
         </div>

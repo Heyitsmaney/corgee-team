@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Building2, ShoppingCart, TrendingUp, Shield, Gift, Map, Coins, Trophy, Star, Bell, AlertTriangle, X, CheckCircle, Eye, Brain, Zap, Target, Award, Clock, Users, MessageCircle, Play, Pause, Volume2, VolumeX, Calendar, Smartphone, CreditCard, Heart, Flame, TrendingDown, DollarSign, Coffee, TowerControl as GameController2, Headphones, ShoppingBag, Wifi, Battery, Signal } from 'lucide-react';
+import { ArrowLeft, Building2, ShoppingCart, TrendingUp, Shield, Gift, Map, Coins, Trophy, Star, Bell, AlertTriangle, X, CheckCircle, Eye, Brain, Zap, Target, Award, Clock, Users, MessageCircle, Play, Pause, Volume2, VolumeX, Calendar, Smartphone, CreditCard, Heart, Flame, TrendingDown, DollarSign, Coffee, TowerControl as GameController2, Headphones, ShoppingBag, Wifi, Battery, Signal, Sparkles, Crown, Gem, Lightning, Rocket, Gamepad } from 'lucide-react';
 import { BankDistrict } from './districts/BankDistrict';
 import { ScamAlley } from './districts/ScamAlley';
 import { InvestmentPark } from './districts/InvestmentPark';
@@ -447,49 +447,58 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
   const renderDistrictCard = (district: any) => (
     <div
       key={district.id}
-      className="group relative overflow-hidden rounded-2xl border-2 border-white/30 hover:border-white/60 transition-all duration-500 transform hover:scale-105 hover:rotate-1 cursor-pointer"
+      className="group relative overflow-hidden rounded-2xl border-2 border-white/30 hover:border-white/60 transition-all duration-500 transform hover:scale-105 hover:rotate-1 cursor-pointer district-card animate-slideInUp"
+      style={{animationDelay: `${parseInt(district.id) * 0.1}s`}}
       onClick={() => setCurrentDistrict(district.id)}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${district.color} opacity-20 group-hover:opacity-40 transition-opacity duration-500`} />
-      <div className="relative p-8 bg-white/10 backdrop-blur-lg">
+      <div className="relative p-8 glass">
         <div className="flex items-center justify-between mb-4">
-          <district.icon className="text-white group-hover:scale-110 transition-transform duration-300" size={48} />
+          <div className="p-4 rounded-full bg-white/10 group-hover:bg-white/20 transition-all duration-300">
+            <district.icon className="text-white group-hover:scale-110 transition-transform duration-300" size={32} />
+          </div>
           <div className="text-right">
-            <div className="text-white font-bold text-lg">{district.population}</div>
-            <div className="text-purple-200 text-sm">Citizens</div>
+            <div className="text-white font-bold text-2xl gradient-text">{district.population}</div>
+            <div className="text-purple-200 text-xs font-medium">Citizens</div>
           </div>
         </div>
         
-        <h3 className="text-white font-bold text-xl mb-2 group-hover:text-yellow-200 transition-colors">
+        <h3 className="text-white font-bold text-xl mb-3 group-hover:text-yellow-200 transition-colors">
           {district.name}
         </h3>
-        <p className="text-purple-200 text-sm mb-4 group-hover:text-purple-100 transition-colors">
+        <p className="text-purple-200 text-sm mb-6 group-hover:text-purple-100 transition-colors leading-relaxed">
           {district.description}
         </p>
         
-        <div className="space-y-2 mb-4">
+        <div className="space-y-3 mb-6">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-purple-300">Special Feature:</span>
-            <span className="text-white font-medium">{district.specialFeature}</span>
+            <span className="text-purple-300 flex items-center">
+              <Sparkles size={14} className="mr-1" />
+              Special Feature:
+            </span>
+            <span className="text-white font-medium text-xs">{district.specialFeature}</span>
           </div>
         </div>
 
-        <div className="space-y-1">
-          <h4 className="text-white font-semibold text-sm">Buildings:</h4>
-          <div className="grid grid-cols-2 gap-1 text-xs">
+        <div className="space-y-2">
+          <h4 className="text-white font-semibold text-sm flex items-center">
+            <Building2 size={14} className="mr-1" />
+            Buildings:
+          </h4>
+          <div className="grid grid-cols-2 gap-2 text-xs">
             {district.buildings.map((building: string, index: number) => (
-              <div key={index} className="text-purple-200 group-hover:text-purple-100 transition-colors">
+              <div key={index} className="text-purple-200 group-hover:text-purple-100 transition-colors bg-white/5 rounded px-2 py-1">
                 • {building}
               </div>
             ))}
           </div>
         </div>
 
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-6 right-6">
           {district.unlocked ? (
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+            <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse-glow shadow-lg shadow-green-400/50"></div>
           ) : (
-            <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+            <div className="w-4 h-4 bg-red-400 rounded-full animate-pulse"></div>
           )}
         </div>
       </div>
@@ -721,108 +730,131 @@ export const GameWorld: React.FC<GameWorldProps> = ({ onNavigate }) => {
   const renderOverview = () => (
     <div className="space-y-8">
       {/* City Header */}
-      <div className="text-center">
-        <Map className="mx-auto mb-4 text-purple-400" size={64} />
-        <h1 className="text-4xl font-bold text-white mb-2">FinVerse City</h1>
-        <p className="text-purple-200 text-lg">Explore districts, complete missions, and master financial skills!</p>
+      <div className="text-center animate-slideInDown">
+        <div className="relative inline-block mb-6">
+          <Map className="mx-auto text-purple-400 animate-float" size={80} />
+          <div className="absolute -top-2 -right-2">
+            <Sparkles className="text-yellow-400 animate-pulse" size={24} />
+          </div>
+        </div>
+        <h1 className="text-5xl font-bold text-white mb-4 gradient-text">FinVerse City</h1>
+        <p className="text-purple-200 text-xl leading-relaxed max-w-2xl mx-auto">
+          Explore districts, complete missions, and master financial skills in the ultimate Gen Z money game! 🚀
+        </p>
       </div>
 
       {/* City Stats */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-        <h2 className="text-white font-bold text-xl mb-4">City Statistics</h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="glass rounded-2xl p-8 border border-white/20 animate-slideInUp">
+        <h2 className="text-white font-bold text-2xl mb-6 gradient-text flex items-center">
+          <BarChart3 className="mr-3" size={28} />
+          City Statistics (Live)
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {[
-            { name: 'Population', value: cityStats.population, icon: Users, color: 'text-blue-400' },
-            { name: 'Happiness', value: `${cityStats.happiness}%`, icon: Star, color: 'text-yellow-400' },
-            { name: 'Security', value: `${cityStats.security}%`, icon: Shield, color: 'text-red-400' },
-            { name: 'Economy', value: `${cityStats.economy}%`, icon: TrendingUp, color: 'text-green-400' },
-            { name: 'Education', value: `${cityStats.education}%`, icon: Brain, color: 'text-purple-400' }
+            { name: 'Population', value: cityStats.population.toLocaleString(), icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/20' },
+            { name: 'Happiness', value: `${cityStats.happiness}%`, icon: Heart, color: 'text-pink-400', bg: 'bg-pink-500/20' },
+            { name: 'Security', value: `${cityStats.security}%`, icon: Shield, color: 'text-red-400', bg: 'bg-red-500/20' },
+            { name: 'Economy', value: `${cityStats.economy}%`, icon: TrendingUp, color: 'text-green-400', bg: 'bg-green-500/20' },
+            { name: 'Education', value: `${cityStats.education}%`, icon: Brain, color: 'text-purple-400', bg: 'bg-purple-500/20' }
           ].map(stat => (
-            <div key={stat.name} className="text-center">
-              <stat.icon className={`mx-auto mb-2 ${stat.color}`} size={24} />
-              <div className="text-white font-bold text-lg">{stat.value}</div>
-              <div className="text-purple-300 text-sm">{stat.name}</div>
+            <div key={stat.name} className="text-center group">
+              <div className={`p-4 rounded-full ${stat.bg} mx-auto mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                <stat.icon className={`${stat.color}`} size={28} />
+              </div>
+              <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+              <div className="text-purple-300 text-sm font-medium">{stat.name}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Districts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {districts.map(renderDistrictCard)}
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-        <h2 className="text-white font-bold text-xl mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="glass rounded-2xl p-8 border border-white/20 animate-slideInUp" style={{animationDelay: '0.4s'}}>
+        <h2 className="text-white font-bold text-2xl mb-6 gradient-text flex items-center">
+          <Lightning className="mr-3" size={28} />
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <button
             onClick={() => onNavigate('challenge')}
-            className="bg-gradient-to-r from-orange-600 to-red-600 text-white p-4 rounded-xl hover:from-orange-700 hover:to-red-700 transition-colors"
+            className="btn-warning p-6 rounded-xl transition-all interactive-card group"
           >
-            <Calendar className="mx-auto mb-2" size={24} />
-            <div className="font-semibold text-sm">Daily Challenge</div>
+            <Calendar className="mx-auto mb-3 group-hover:scale-110 transition-transform" size={32} />
+            <div className="font-bold text-sm">Daily Challenge</div>
+            <div className="text-xs opacity-80 mt-1">Earn 2x XP</div>
           </button>
           
           <button
             onClick={() => setCurrentDistrict('reward')}
-            className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white p-4 rounded-xl hover:from-yellow-700 hover:to-orange-700 transition-colors"
+            className="btn-success p-6 rounded-xl transition-all interactive-card group"
           >
-            <Gift className="mx-auto mb-2" size={24} />
-            <div className="font-semibold text-sm">Spin Wheel</div>
+            <Gift className="mx-auto mb-3 group-hover:scale-110 transition-transform" size={32} />
+            <div className="font-bold text-sm">Spin Wheel</div>
+            <div className="text-xs opacity-80 mt-1">Win NFTs</div>
           </button>
           
           <button
             onClick={() => onNavigate('community')}
-            className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-4 rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-colors"
+            className="btn-primary p-6 rounded-xl transition-all interactive-card group"
           >
-            <Users className="mx-auto mb-2" size={24} />
-            <div className="font-semibold text-sm">Community</div>
+            <Users className="mx-auto mb-3 group-hover:scale-110 transition-transform" size={32} />
+            <div className="font-bold text-sm">Community</div>
+            <div className="text-xs opacity-80 mt-1">Share & Learn</div>
           </button>
           
           <button
             onClick={() => setShowMissionPanel(true)}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-colors"
+            className="btn-danger p-6 rounded-xl transition-all interactive-card group"
           >
-            <Target className="mx-auto mb-2" size={24} />
-            <div className="font-semibold text-sm">Missions</div>
+            <Target className="mx-auto mb-3 group-hover:scale-110 transition-transform" size={32} />
+            <div className="font-bold text-sm">Missions</div>
+            <div className="text-xs opacity-80 mt-1">Epic Rewards</div>
           </button>
         </div>
       </div>
 
       {/* Active Missions Preview */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+      <div className="glass rounded-2xl p-8 border border-white/20 animate-slideInUp" style={{animationDelay: '0.6s'}}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-white font-bold text-xl">Active Missions</h2>
+          <h2 className="text-white font-bold text-2xl gradient-text flex items-center">
+            <Rocket className="mr-3" size={28} />
+            Active Missions
+          </h2>
           <button
             onClick={() => setShowMissionPanel(true)}
-            className="text-purple-300 hover:text-white text-sm transition-colors"
+            className="text-purple-300 hover:text-white text-sm transition-colors font-medium flex items-center"
           >
+            <Crown size={16} className="mr-1" />
             View All →
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {activeMissions.slice(0, 4).map(mission => (
-            <div key={mission.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div key={mission.id} className="glass-dark rounded-lg p-6 border border-white/10 interactive-card">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-white font-semibold text-sm">{mission.title}</h3>
-                <span className={`px-2 py-1 rounded text-xs ${
+                <h3 className="text-white font-semibold">{mission.title}</h3>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                   mission.completed ? 'bg-green-500/30 text-green-200' : 'bg-blue-500/30 text-blue-200'
                 }`}>
                   {mission.completed ? 'COMPLETE' : 'ACTIVE'}
                 </span>
               </div>
-              <div className="w-full bg-gray-700/30 rounded-full h-2 mb-2">
+              <div className="w-full bg-gray-700/30 rounded-full h-3 mb-3">
                 <div 
-                  className={`h-2 rounded-full transition-all duration-500 ${
+                  className={`h-3 rounded-full transition-all duration-700 ${
                     mission.completed ? 'bg-green-400' : 'bg-blue-400'
                   }`}
                   style={{ width: `${(mission.progress / mission.maxProgress) * 100}%` }}
                 />
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-purple-300">{mission.district} district</span>
-                <span className="text-white">{mission.progress}/{mission.maxProgress}</span>
+                <span className="text-purple-300 font-medium capitalize">{mission.district} district</span>
+                <span className="text-white font-bold">{mission.progress}/{mission.maxProgress}</span>
               </div>
             </div>
           ))}
