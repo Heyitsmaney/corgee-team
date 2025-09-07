@@ -356,6 +356,489 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
     }
   };
 
+  const renderLessons = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <Brain className="mx-auto mb-4 text-blue-400 animate-pulse-glow" size={64} />
+        <h2 className="text-3xl font-bold text-white mb-2 gradient-text">Banking Academy</h2>
+        <p className="text-blue-200 text-lg">Interactive lessons that don't suck! 🎮</p>
+        <div className="mt-4 flex items-center justify-center space-x-6 text-sm">
+          <div className="flex items-center space-x-2">
+            <Zap className="text-yellow-400" size={16} />
+            <span className="text-yellow-200">Interactive Scenarios</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Trophy className="text-purple-400" size={16} />
+            <span className="text-purple-200">Instant Rewards</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Target className="text-green-400" size={16} />
+            <span className="text-green-200">Real-World Practice</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-8">
+        {/* Lesson 1: Banking Basics - Interactive Story */}
+        <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl p-8 border border-blue-500/30 interactive-card">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-4 bg-blue-500/20 rounded-full">
+                <Building2 className="text-blue-400" size={32} />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">Banking Basics: Your First Account</h3>
+                <p className="text-blue-200">Interactive story-based learning</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-yellow-400 font-bold text-xl">+150 coins</div>
+              <div className="text-yellow-200 text-sm">Completion reward</div>
+            </div>
+          </div>
+
+          <div className="bg-white/5 rounded-lg p-6 mb-6 border-l-4 border-blue-500">
+            <h4 className="text-white font-semibold mb-3 flex items-center">
+              <Smartphone className="mr-2" size={20} />
+              Scenario: You just turned 18 and need your first bank account
+            </h4>
+            <p className="text-blue-200 mb-4">
+              You walk into Vietcombank with your ID and 2M VND birthday money. The banker offers you three account types...
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white/10 rounded-lg p-4 border border-white/20 hover:border-blue-400 transition-all cursor-pointer group">
+              <h5 className="text-white font-semibold mb-2">💳 Basic Savings</h5>
+              <ul className="text-blue-200 text-sm space-y-1 mb-3">
+                <li>• 0.5% interest annually</li>
+                <li>• No monthly fees</li>
+                <li>• ATM card included</li>
+                <li>• 5 free transfers/month</li>
+              </ul>
+              <div className="text-green-400 text-xs font-medium">✅ Best for beginners</div>
+            </div>
+
+            <div className="bg-white/10 rounded-lg p-4 border border-white/20 hover:border-yellow-400 transition-all cursor-pointer group">
+              <h5 className="text-white font-semibold mb-2">💎 Premium Account</h5>
+              <ul className="text-yellow-200 text-sm space-y-1 mb-3">
+                <li>• 2.5% interest annually</li>
+                <li>• 50K VND monthly fee</li>
+                <li>• Premium debit card</li>
+                <li>• Unlimited transfers</li>
+              </ul>
+              <div className="text-yellow-400 text-xs font-medium">⚠️ High fees for low balance</div>
+            </div>
+
+            <div className="bg-white/10 rounded-lg p-4 border border-white/20 hover:border-red-400 transition-all cursor-pointer group">
+              <h5 className="text-white font-semibold mb-2">🎯 Investment Package</h5>
+              <ul className="text-red-200 text-sm space-y-1 mb-3">
+                <li>• "Guaranteed" 8% returns</li>
+                <li>• 100K VND setup fee</li>
+                <li>• Lock-in for 2 years</li>
+                <li>• "Special promotion"</li>
+              </ul>
+              <div className="text-red-400 text-xs font-medium">🚨 Too good to be true!</div>
+            </div>
+          </div>
+
+          <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 mb-4">
+            <h5 className="text-green-300 font-semibold mb-2">💡 Pro Tips:</h5>
+            <ul className="text-green-200 text-sm space-y-1">
+              <li>• Start simple - you can always upgrade later</li>
+              <li>• Calculate if premium fees are worth the benefits</li>
+              <li>• Be suspicious of "guaranteed" high returns</li>
+              <li>• Read all terms and conditions carefully</li>
+            </ul>
+          </div>
+
+          <button
+            onClick={() => {
+              addCoins(150);
+              updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 15 });
+            }}
+            className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-cyan-700 transition-colors text-lg"
+          >
+            Complete Banking Basics (+150 coins)
+          </button>
+        </div>
+
+        {/* Lesson 2: Credit Cards - Decision Game */}
+        <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl p-8 border border-purple-500/30 interactive-card">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-4 bg-purple-500/20 rounded-full">
+                <CreditCard className="text-purple-400" size={32} />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">Credit Cards: Friend or Foe?</h3>
+                <p className="text-purple-200">Interactive decision-making game</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-yellow-400 font-bold text-xl">+200 coins</div>
+              <div className="text-yellow-200 text-sm">Smart choices bonus</div>
+            </div>
+          </div>
+
+          <div className="bg-white/5 rounded-lg p-6 mb-6 border-l-4 border-purple-500">
+            <h4 className="text-white font-semibold mb-3 flex items-center">
+              <ShoppingBag className="mr-2" size={20} />
+              Scenario: You're at the mall and see the perfect outfit (3M VND)
+            </h4>
+            <p className="text-purple-200 mb-4">
+              You have 500K in cash, 2M in savings, and a credit card with 10M limit. What do you do?
+            </p>
+          </div>
+
+          <div className="space-y-4 mb-6">
+            <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4 cursor-pointer hover:bg-red-500/30 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="text-white font-semibold">💳 Use Credit Card (YOLO!)</h5>
+                <span className="text-red-400 text-sm">-50 coins</span>
+              </div>
+              <p className="text-red-200 text-sm mb-2">"I'll pay it off later... maybe"</p>
+              <div className="text-red-300 text-xs">
+                ❌ Result: 24% interest = 720K extra if you take 1 year to pay off
+              </div>
+            </div>
+
+            <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 cursor-pointer hover:bg-yellow-500/30 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="text-white font-semibold">💰 Use Savings</h5>
+                <span className="text-yellow-400 text-sm">+25 coins</span>
+              </div>
+              <p className="text-yellow-200 text-sm mb-2">"I have the money, why not?"</p>
+              <div className="text-yellow-300 text-xs">
+                ⚠️ Result: Depletes emergency fund, but no debt
+              </div>
+            </div>
+
+            <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 cursor-pointer hover:bg-green-500/30 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="text-white font-semibold">🧠 Wait and Save</h5>
+                <span className="text-green-400 text-sm">+100 coins</span>
+              </div>
+              <p className="text-green-200 text-sm mb-2">"I'll save up for it properly"</p>
+              <div className="text-green-300 text-xs">
+                ✅ Result: Builds discipline, keeps emergency fund intact
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4 mb-4">
+            <h5 className="text-blue-300 font-semibold mb-2">🎯 Credit Card Reality Check:</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <h6 className="text-blue-200 font-medium mb-1">Smart Uses:</h6>
+                <ul className="text-blue-200 space-y-1">
+                  <li>• Building credit history</li>
+                  <li>• Emergency expenses only</li>
+                  <li>• Online purchase protection</li>
+                  <li>• Cashback on planned purchases</li>
+                </ul>
+              </div>
+              <div>
+                <h6 className="text-blue-200 font-medium mb-1">Danger Zones:</h6>
+                <ul className="text-blue-200 space-y-1">
+                  <li>• Impulse shopping</li>
+                  <li>• Only paying minimums</li>
+                  <li>• Cash advances (28% interest!)</li>
+                  <li>• Multiple cards without tracking</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              addCoins(200);
+              updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 20 });
+            }}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-colors text-lg"
+          >
+            Master Credit Cards (+200 coins)
+          </button>
+        </div>
+
+        {/* Lesson 3: Loans - Real Calculator */}
+        <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl p-8 border border-orange-500/30 interactive-card">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-4 bg-orange-500/20 rounded-full">
+                <Calculator className="text-orange-400" size={32} />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">Loan Calculator Mastery</h3>
+                <p className="text-orange-200">Interactive loan comparison tool</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-yellow-400 font-bold text-xl">+250 coins</div>
+              <div className="text-yellow-200 text-sm">Calculator expert</div>
+            </div>
+          </div>
+
+          <div className="bg-white/5 rounded-lg p-6 mb-6 border-l-4 border-orange-500">
+            <h4 className="text-white font-semibold mb-3 flex items-center">
+              <Car className="mr-2" size={20} />
+              Challenge: Find the best motorbike loan for 60M VND
+            </h4>
+            <p className="text-orange-200 mb-4">
+              Compare these three loan offers and calculate which saves you the most money:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+              <h5 className="text-white font-semibold mb-3">🏦 Bank A</h5>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Interest Rate:</span>
+                  <span className="text-white font-bold">12% APR</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Term:</span>
+                  <span className="text-white">48 months</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Processing Fee:</span>
+                  <span className="text-white">1M VND</span>
+                </div>
+                <div className="border-t border-white/20 pt-2 mt-2">
+                  <div className="flex justify-between">
+                    <span className="text-orange-200">Monthly Payment:</span>
+                    <span className="text-green-400 font-bold">1,580,000 VND</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-orange-200">Total Cost:</span>
+                    <span className="text-red-400 font-bold">76,840,000 VND</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+              <h5 className="text-white font-semibold mb-3">🏪 Dealer Finance</h5>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Interest Rate:</span>
+                  <span className="text-white font-bold">15% APR</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Term:</span>
+                  <span className="text-white">36 months</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Processing Fee:</span>
+                  <span className="text-white">500K VND</span>
+                </div>
+                <div className="border-t border-white/20 pt-2 mt-2">
+                  <div className="flex justify-between">
+                    <span className="text-orange-200">Monthly Payment:</span>
+                    <span className="text-green-400 font-bold">2,080,000 VND</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-orange-200">Total Cost:</span>
+                    <span className="text-red-400 font-bold">75,380,000 VND</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/10 rounded-lg p-4 border border-green-500/50">
+              <h5 className="text-white font-semibold mb-3">🤝 Credit Union</h5>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Interest Rate:</span>
+                  <span className="text-white font-bold">10% APR</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Term:</span>
+                  <span className="text-white">42 months</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-orange-200">Processing Fee:</span>
+                  <span className="text-white">300K VND</span>
+                </div>
+                <div className="border-t border-white/20 pt-2 mt-2">
+                  <div className="flex justify-between">
+                    <span className="text-orange-200">Monthly Payment:</span>
+                    <span className="text-green-400 font-bold">1,720,000 VND</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-orange-200">Total Cost:</span>
+                    <span className="text-green-400 font-bold">72,540,000 VND</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-2 text-center">
+                <span className="bg-green-500/30 text-green-200 px-2 py-1 rounded text-xs font-bold">
+                  BEST DEAL! Saves 4.3M VND
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-purple-500/20 border border-purple-500/30 rounded-lg p-4 mb-4">
+            <h5 className="text-purple-300 font-semibold mb-2">🧮 Loan Shopping Pro Tips:</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <ul className="text-purple-200 space-y-1">
+                <li>• Compare total cost, not just monthly payment</li>
+                <li>• Factor in all fees and charges</li>
+                <li>• Shorter terms = less total interest</li>
+                <li>• Credit unions often have better rates</li>
+              </ul>
+              <ul className="text-purple-200 space-y-1">
+                <li>• Get pre-approved to know your budget</li>
+                <li>• Don't let dealers handle financing without comparison</li>
+                <li>• Read all terms before signing</li>
+                <li>• Consider paying extra toward principal</li>
+              </ul>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              addCoins(250);
+              updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 25 });
+            }}
+            className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-4 rounded-lg font-semibold hover:from-orange-700 hover:to-red-700 transition-colors text-lg"
+          >
+            Become Loan Calculator Expert (+250 coins)
+          </button>
+        </div>
+
+        {/* Lesson 4: Emergency Fund - Survival Game */}
+        <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl p-8 border border-green-500/30 interactive-card">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-4 bg-green-500/20 rounded-full">
+                <Shield className="text-green-400" size={32} />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">Emergency Fund: Financial Survival</h3>
+                <p className="text-green-200">Interactive crisis simulation</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-yellow-400 font-bold text-xl">+300 coins</div>
+              <div className="text-yellow-200 text-sm">Survival master</div>
+            </div>
+          </div>
+
+          <div className="bg-white/5 rounded-lg p-6 mb-6 border-l-4 border-green-500">
+            <h4 className="text-white font-semibold mb-3 flex items-center">
+              <AlertTriangle className="mr-2 text-red-400" size={20} />
+              Crisis Simulation: Your motorbike breaks down
+            </h4>
+            <p className="text-green-200 mb-4">
+              Repair cost: 8M VND. You need it for work. You have different financial situations to choose from:
+            </p>
+          </div>
+
+          <div className="space-y-4 mb-6">
+            <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
+              <h5 className="text-white font-semibold mb-2 flex items-center">
+                <X className="mr-2 text-red-400" size={16} />
+                Scenario A: No Emergency Fund
+              </h5>
+              <div className="text-red-200 text-sm space-y-2">
+                <p><strong>Your options:</strong></p>
+                <ul className="ml-4 space-y-1">
+                  <li>• Credit card (24% interest) = 10M total cost</li>
+                  <li>• Borrow from family (awkward + strain relationships)</li>
+                  <li>• Payday loan (300% APR) = financial disaster</li>
+                  <li>• Miss work = lose income</li>
+                </ul>
+                <div className="bg-red-600/30 p-2 rounded mt-2">
+                  <strong>Result: Stress level 📈📈📈 Financial damage: Severe</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
+              <h5 className="text-white font-semibold mb-2 flex items-center">
+                <CheckCircle className="mr-2 text-green-400" size={16} />
+                Scenario B: 6-Month Emergency Fund (30M VND)
+              </h5>
+              <div className="text-green-200 text-sm space-y-2">
+                <p><strong>Your options:</strong></p>
+                <ul className="ml-4 space-y-1">
+                  <li>• Pay cash from emergency fund</li>
+                  <li>• No interest, no debt, no stress</li>
+                  <li>• Rebuild fund over next few months</li>
+                  <li>• Continue working without interruption</li>
+                </ul>
+                <div className="bg-green-600/30 p-2 rounded mt-2">
+                  <strong>Result: Stress level 📉 Financial damage: Minimal</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4 mb-4">
+            <h5 className="text-blue-300 font-semibold mb-3">🎯 Emergency Fund Building Strategy:</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h6 className="text-blue-200 font-medium mb-2">Start Small:</h6>
+                <ul className="text-blue-200 text-sm space-y-1">
+                  <li>• Week 1-4: Save 1M VND</li>
+                  <li>• Month 2-3: Build to 5M VND</li>
+                  <li>• Month 4-6: Reach 15M VND</li>
+                  <li>• Month 7-12: Full 6-month fund</li>
+                </ul>
+              </div>
+              <div>
+                <h6 className="text-blue-200 font-medium mb-2">Smart Tactics:</h6>
+                <ul className="text-blue-200 text-sm space-y-1">
+                  <li>• Automate transfers on payday</li>
+                  <li>• Use high-yield savings account</li>
+                  <li>• Save windfalls (bonuses, gifts)</li>
+                  <li>• Cut one subscription = 200K/month</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 mb-4">
+            <h5 className="text-yellow-300 font-semibold mb-2">💡 Real Talk: Why People Skip Emergency Funds</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <h6 className="text-yellow-200 font-medium mb-1">Common Excuses:</h6>
+                <ul className="text-yellow-200 space-y-1">
+                  <li>• "Nothing bad will happen to me"</li>
+                  <li>• "I can just use credit cards"</li>
+                  <li>• "I'll start saving next month"</li>
+                  <li>• "My parents will help me"</li>
+                </ul>
+              </div>
+              <div>
+                <h6 className="text-yellow-200 font-medium mb-1">Reality Check:</h6>
+                <ul className="text-yellow-200 space-y-1">
+                  <li>• 78% of people live paycheck to paycheck</li>
+                  <li>• Average emergency happens every 3-4 years</li>
+                  <li>• Credit card debt = 24% interest trap</li>
+                  <li>• Independence > depending on others</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              addCoins(300);
+              updateProgress({ financialLiteracyScore: progress.financialLiteracyScore + 30 });
+            }}
+            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-colors text-lg"
+          >
+            Master Financial Survival (+300 coins)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderSavingsGames = () => (
     <div className="space-y-6">
       <div className="text-center">
@@ -796,6 +1279,8 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
 
   const renderContent = () => {
     switch (activeGame) {
+      case 'lessons':
+        return renderLessons();
       case 'savings':
         return renderSavingsGames();
       case 'loans':
