@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { Home, Gamepad2, Calendar, Users, Settings as SettingsIcon, Trophy, Coins, Target, TrendingUp, Shield, Star, BarChart3, PieChart, Activity, Award, Clock, CheckCircle, AlertTriangle, Brain, Zap, Eye, BookOpen, RefreshCw, Flame, Heart, Sparkles, Crown, Gem, CloudLightning as Lightning, Rocket, Headphones, Gamepad, Smartphone, Wifi, Battery, Signal } from 'lucide-react'' | 'community' | 'settings') => void;
+import { Home, Gamepad2, Calendar, Users, Settings as SettingsIcon, Trophy, Coins, Target, TrendingUp, Shield, Star, BarChart3, PieChart, Activity, Award, Clock, CheckCircle, AlertTriangle, Brain, Zap, Eye, BookOpen, RefreshCw, Flame, Heart, Sparkles, Crown, Gem, CloudLightning as Lightning, Rocket, Headphones, Gamepad, Smartphone, Wifi, Battery, Signal } from 'lucide-react';
+import { useUser } from '../contexts/UserContext';
+
+interface DashboardProps {
+  onNavigate: (screen: 'dashboard' | 'game' | 'challenge' | 'community' | 'settings') => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
