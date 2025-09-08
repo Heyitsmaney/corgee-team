@@ -819,7 +819,7 @@ export const BankDistrict: React.FC<BankDistrictProps> = ({ onBack }) => {
                   <li>• 78% of people live paycheck to paycheck</li>
                   <li>• Average emergency happens every 3-4 years</li>
                   <li>• Credit card debt = 24% interest trap</li>
-                  <li>• Independence > depending on others</li>
+                  <li>• Independence {'>'} depending on others</li>
                 </ul>
               </div>
             </div>
